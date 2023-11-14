@@ -193,7 +193,10 @@ def copy_from_tests(mbedtls_root_path, psa_crypto_root_path):
                           "test_suite_platform.*|"\
                           "test_suite_pkcs7.*|"\
                           "test_suite_hkdf.*|"\
-                          "test_suite_psa_crypto_se_driver.*",
+                          "test_suite_psa_crypto_se_driver.*|"\
+                          ## The test_suite_constant_time_hmac test suite tests
+                          ## mbedtls_ct_hmac() which is in TLS library.
+                          "test_suite_constant_time_hmac.*",
                           file_), os.listdir(os.path.join(source_path, "suites")))
     for file_ in suites_files:
         shutil.copy2(os.path.join(source_path, "suites", file_),
