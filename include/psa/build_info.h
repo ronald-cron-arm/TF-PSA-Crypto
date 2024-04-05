@@ -35,6 +35,64 @@
                                       STRINGIFY(TF_PSA_CRYPTO_VERSION_PATCH)
 #define TF_PSA_CRYPTO_VERSION_STRING_FULL  ("TF-PSA-Crypto " TF_PSA_CRYPTO_VERSION_STRING)
 
+/* Macros for build-time platform detection */
+
+#if !defined(MBEDTLS_ARCH_IS_ARM64) && \
+    (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC))
+#define MBEDTLS_ARCH_IS_ARM64
+#endif
+
+#if !defined(MBEDTLS_ARCH_IS_ARM32) && \
+    (defined(__arm__) || defined(_M_ARM) || \
+    defined(_M_ARMT) || defined(__thumb__) || defined(__thumb2__))
+#define MBEDTLS_ARCH_IS_ARM32
+#endif
+
+#if !defined(MBEDTLS_ARCH_IS_X64) && \
+    (defined(__amd64__) || defined(__x86_64__) || \
+    ((defined(_M_X64) || defined(_M_AMD64)) && !defined(_M_ARM64EC)))
+#define MBEDTLS_ARCH_IS_X64
+#endif
+
+#if !defined(MBEDTLS_ARCH_IS_X86) && \
+    (defined(__i386__) || defined(_X86_) || \
+    (defined(_M_IX86) && !defined(_M_I86)))
+#define MBEDTLS_ARCH_IS_X86
+#endif
+
+#if !defined(MBEDTLS_PLATFORM_IS_WINDOWS_ON_ARM64) && \
+    (defined(_M_ARM64) || defined(_M_ARM64EC))
+#define MBEDTLS_PLATFORM_IS_WINDOWS_ON_ARM64
+#endif
+
+/* This is defined if the architecture is Armv8-A, or higher */
+#if !defined(MBEDTLS_ARCH_IS_ARMV8_A)
+#if defined(__ARM_ARCH) && defined(__ARM_ARCH_PROFILE)
+#if (__ARM_ARCH >= 8) && (__ARM_ARCH_PROFILE == 'A')
+/* GCC, clang, armclang and IAR */
+#define MBEDTLS_ARCH_IS_ARMV8_A
+#endif
+#elif defined(__ARM_ARCH_8A)
+/* Alternative defined by clang */
+#define MBEDTLS_ARCH_IS_ARMV8_A
+#elif defined(_M_ARM64) || defined(_M_ARM64EC)
+/* MSVC ARM64 is at least Armv8.0-A */
+#define MBEDTLS_ARCH_IS_ARMV8_A
+#endif
+#endif
+
+#if defined(__GNUC__) && !defined(__ARMCC_VERSION) && !defined(__clang__) \
+    && !defined(__llvm__) && !defined(__INTEL_COMPILER)
+/* Defined if the compiler really is gcc and not clang, etc */
+#define MBEDTLS_COMPILER_IS_GCC
+#define MBEDTLS_GCC_VERSION \
+    (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#endif
+
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
+#define _CRT_SECURE_NO_DEPRECATE 1
+#endif
+
 /* Define `inline` on some non-C99-compliant compilers. */
 #if ( defined(__ARMCC_VERSION) || defined(_MSC_VER) ) && \
     !defined(inline) && !defined(__cplusplus)
