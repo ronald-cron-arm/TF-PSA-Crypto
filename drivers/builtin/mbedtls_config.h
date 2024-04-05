@@ -14,7 +14,6 @@
 
 #define MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_CRYPTO_CONFIG
-#define MBEDTLS_CIPHER_C /* Prerequisite of MBEDTLS_PSA_CRYPTO_C */
 #define MBEDTLS_USE_PSA_CRYPTO
 
 /*
