@@ -13,7 +13,7 @@ import re
 import shutil
 import stat
 
-def copy_of_psa_headers(mbedtls_root_path, psa_crypto_root_path):
+def copy_of_psa_headers(mbedtls_root_path, psa_crypto_root_path, delete):
     source_path = os.path.join(mbedtls_root_path, "include", "psa")
     destination_path = os.path.join(psa_crypto_root_path, "include", "psa")
     include_files = filter(lambda file_: not re.match("build_info\.h|crypto_config\.h", file_),
@@ -21,7 +21,10 @@ def copy_of_psa_headers(mbedtls_root_path, psa_crypto_root_path):
     for file_ in include_files:
         shutil.copy2(os.path.join(source_path, file_), destination_path)
 
-def copy_of_mbedtls_headers(mbedtls_root_path, psa_crypto_root_path):
+    if delete:
+        shutil.rmtree(source_path)
+
+def copy_of_mbedtls_headers(mbedtls_root_path, psa_crypto_root_path, delete):
     source_path = os.path.join(mbedtls_root_path, "include", "mbedtls")
     builtin_path = os.path.join(psa_crypto_root_path, "drivers", "builtin")
     destination_path = os.path.join(builtin_path, "include", "mbedtls")
@@ -34,6 +37,8 @@ def copy_of_mbedtls_headers(mbedtls_root_path, psa_crypto_root_path):
                            os.listdir(source_path))
     for file_ in include_files:
         shutil.copy2(os.path.join(source_path, file_), destination_path)
+        if delete:
+            shutil.rmtree(os.path.join(source_path, file_))
 
     ## Overwrite Mbed TLS default configuration file with the TF-PSA-Crypto
     ## repository specific one.
@@ -41,8 +46,10 @@ def copy_of_mbedtls_headers(mbedtls_root_path, psa_crypto_root_path):
 
     if os.path.isfile(os.path.join(source_path, "lms.h")):
         shutil.copy2(os.path.join(source_path, "lms.h"), include_tf_psa_crypto_path)
+        if delete:
+            shutil.rmtree(os.path.join(source_path, "lms.h"))
 
-def copy_from_library(mbedtls_root_path, psa_crypto_root_path):
+def copy_from_library(mbedtls_root_path, psa_crypto_root_path, delete):
     builtin_path = os.path.join(psa_crypto_root_path, "drivers", "builtin")
     library_files = filter(lambda file_: not re.match(
                            ".*\.o|x509.*|mps.*|ssl.*|padlock\.*|pkcs7.*|"\
@@ -58,6 +65,8 @@ def copy_from_library(mbedtls_root_path, psa_crypto_root_path):
     for file_ in library_files:
         shutil.copy2(os.path.join(mbedtls_root_path, "library", file_),
                      os.path.join(builtin_path, "src"))
+        if delete:
+            shutil.rmtree(os.path.join(mbedtls_root_path, "library", file_))
 
     psa_crypto_core_files = [ "psa_crypto.c",
                               "psa_crypto_client.c",
@@ -82,7 +91,7 @@ def copy_from_library(mbedtls_root_path, psa_crypto_root_path):
     shutil.copy2(os.path.join(mbedtls_root_path, "library", "alignment.h"),
                  os.path.join(psa_crypto_root_path, "core"))
 
-def copy_from_scripts(mbedtls_root_path, psa_crypto_root_path):
+def copy_from_scripts(mbedtls_root_path, psa_crypto_root_path, delete):
     source_path = os.path.join(mbedtls_root_path, "scripts")
     destination_path = os.path.join(psa_crypto_root_path, "scripts")
 
@@ -100,13 +109,17 @@ def copy_from_scripts(mbedtls_root_path, psa_crypto_root_path):
     shutil.copy2(os.path.join(source_path, "min_requirements.py"), destination_path)
     shutil.copy2(os.path.join(source_path, "lcov.sh"), destination_path)
 
+    if delete:
+        shutil.rmtree(os.path.join(source_path, "generate_driver_wrappers.py"))
+        shutil.rmtree(os.path.join(source_path, "generate_psa_constants.py"))
+
     for path in pathlib.Path(source_path).glob("*.requirements.txt"):
         shutil.copy2(str(path), destination_path)
 
     shutil.copytree(os.path.join(source_path, "mbedtls_dev"),
                     os.path.join(destination_path, "mbedtls_dev"), dirs_exist_ok=True)
 
-def copy_from_tests(mbedtls_root_path, psa_crypto_root_path):
+def copy_from_tests(mbedtls_root_path, psa_crypto_root_path, delete):
     source_path = os.path.join(mbedtls_root_path, "tests")
     destination_path = os.path.join(psa_crypto_root_path, "tests")
 
@@ -205,17 +218,22 @@ def copy_from_tests(mbedtls_root_path, psa_crypto_root_path):
     for file_ in suites_files:
         shutil.copy2(os.path.join(source_path, "suites", file_),
                      os.path.join(destination_path, "suites", file_))
+        if delete:
+            shutil.rmtree(os.path.join(source_path, "suites", file_))
 
     ## tests/data_files
     shutil.copytree(os.path.join(source_path, "data_files"),
                     os.path.join(destination_path, "data_files"))
 
-def copy_from_programs(mbedtls_root_path, psa_crypto_root_path):
+def copy_from_programs(mbedtls_root_path, psa_crypto_root_path, delete):
     programs_psa_files = filter(lambda file_: not re.match("CMakeLists\.txt|Makefile", file_),
                                 os.listdir(os.path.join(mbedtls_root_path, "programs", "psa")))
     for file_ in programs_psa_files:
         shutil.copy2(os.path.join(mbedtls_root_path, "programs", "psa", file_),
                      os.path.join(psa_crypto_root_path, "programs", "psa"))
+    if delete:
+        shutil.rmtree(os.path.join(mbedtls_root_path, "programs", "psa"))
+    
 
 def copy_from_docs(mbedtls_root_path, psa_crypto_root_path):
     source_path = os.path.join(mbedtls_root_path, "docs", "architecture")
@@ -292,6 +310,11 @@ def main():
         help="path to the Mbed TLS root directory, default is ../mbedtls",
     )
 
+    parser.add_argument(
+        "--delete", type=bool, default=False,
+        help="delete copied files, default is false",
+    )
+
     args = parser.parse_args()
     if not os.path.isdir(args.mbedtls):
         print("Error: {} is not an existing directory".format(args.mbedtls))
@@ -299,12 +322,12 @@ def main():
 
     mbedtls_root_path = os.path.abspath(args.mbedtls)
 
-    copy_of_psa_headers(mbedtls_root_path, os.getcwd())
-    copy_of_mbedtls_headers(mbedtls_root_path, os.getcwd())
-    copy_from_library(mbedtls_root_path, os.getcwd())
-    copy_from_scripts(mbedtls_root_path, os.getcwd())
-    copy_from_tests(mbedtls_root_path, os.getcwd())
-    copy_from_programs(mbedtls_root_path, os.getcwd())
+    copy_of_psa_headers(mbedtls_root_path, os.getcwd(), args.delete)
+    copy_of_mbedtls_headers(mbedtls_root_path, os.getcwd(), args.delete)
+    copy_from_library(mbedtls_root_path, os.getcwd(), args.delete)
+    copy_from_scripts(mbedtls_root_path, os.getcwd(), args.delete)
+    copy_from_tests(mbedtls_root_path, os.getcwd(), args.delete)
+    copy_from_programs(mbedtls_root_path, os.getcwd(), args.delete)
     copy_from_docs(mbedtls_root_path, os.getcwd())
     replace_all_sh_components(os.getcwd())
     extend_config_psa(os.getcwd())
