@@ -65,7 +65,7 @@ endif()
 # Set the project, Mbed TLS and framework root directory.
 set(TF_PSA_CRYPTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(MBEDTLS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
-set(TF_PSA_CRYPTO_FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../framework)
+set(TF_PSA_CRYPTO_FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/framework)
 
 # Put the version numbers into relevant files
 set(version_number_files
@@ -155,7 +155,7 @@ if(TF_PSA_CRYPTO_PYTHON_EXECUTABLE)
     # If 128-bit keys are configured for CTR_DRBG, display an appropriate warning
     execute_process(
         COMMAND
-            ${TF_PSA_CRYPTO_PYTHON_EXECUTABLE} ${TF_PSA_CRYPTO_DIR}/scripts/tf_psa_crypto_config.py
+            ${TF_PSA_CRYPTO_PYTHON_EXECUTABLE} ${TF_PSA_CRYPTO_DIR}/scripts/config.py
             -f ${TF_PSA_CRYPTO_DIR}/include/psa/crypto_config.h
             get MBEDTLS_CTR_DRBG_USE_128_BIT_KEY
         RESULT_VARIABLE
@@ -417,7 +417,7 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
             OUTPUT
                 ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/src/test_keys.h
             WORKING_DIRECTORY
-                ${MBEDTLS_DIR}/tests
+                ${TF_PSA_CRYPTO_DIR}/tests
             COMMAND
                 "${TF_PSA_CRYPTO_PYTHON_EXECUTABLE}"
                 "${TF_PSA_CRYPTO_FRAMEWORK_DIR}/scripts/generate_test_keys.py"
