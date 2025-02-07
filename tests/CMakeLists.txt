@@ -190,75 +190,8 @@ string(REGEX REPLACE "[ ,;]" "|" SKIP_TEST_SUITES_REGEX "${SKIP_TEST_SUITES}")
 string(REPLACE "." "\\." SKIP_TEST_SUITES_REGEX "${SKIP_TEST_SUITES_REGEX}")
 set(SKIP_TEST_SUITES_REGEX "^(${SKIP_TEST_SUITES_REGEX})(\$|\\.)")
 
-function(add_test_suite function_name data_name)
-    # Get the test names of the tests with generated .data files
-    # from the generated_data_files list in parent scope.
-    set(bignum_generated_data_names "")
-    set(config_generated_data_names "")
-    set(ecp_generated_data_names "")
-    set(psa_generated_data_names "")
-    foreach(generated_data_file ${bignum_generated_data_files})
-        # Get the plain filename
-        get_filename_component(generated_data_name ${generated_data_file} NAME)
-        # Remove the ".data" extension
-        get_name_without_last_ext(generated_data_name ${generated_data_name})
-        # Remove leading "test_suite_"
-        string(SUBSTRING ${generated_data_name} 11 -1 generated_data_name)
-        list(APPEND bignum_generated_data_names ${generated_data_name})
-    endforeach()
-    foreach(generated_data_file ${config_generated_data_files})
-        # Get the plain filename
-        get_filename_component(generated_data_name ${generated_data_file} NAME)
-        # Remove the ".data" extension
-        get_name_without_last_ext(generated_data_name ${generated_data_name})
-        # Remove leading "test_suite_"
-        string(SUBSTRING ${generated_data_name} 11 -1 generated_data_name)
-        list(APPEND config_generated_data_names ${generated_data_name})
-    endforeach()
-    foreach(generated_data_file ${ecp_generated_data_files})
-        # Get the plain filename
-        get_filename_component(generated_data_name ${generated_data_file} NAME)
-        # Remove the ".data" extension
-        get_name_without_last_ext(generated_data_name ${generated_data_name})
-        # Remove leading "test_suite_"
-        string(SUBSTRING ${generated_data_name} 11 -1 generated_data_name)
-        list(APPEND ecp_generated_data_names ${generated_data_name})
-    endforeach()
-    foreach(generated_data_file ${psa_generated_data_files})
-        # Get the plain filename
-        get_filename_component(generated_data_name ${generated_data_file} NAME)
-        # Remove the ".data" extension
-        get_name_without_last_ext(generated_data_name ${generated_data_name})
-        # Remove leading "test_suite_"
-        string(SUBSTRING ${generated_data_name} 11 -1 generated_data_name)
-        list(APPEND psa_generated_data_names ${generated_data_name})
-    endforeach()
-
-    if(";${bignum_generated_data_names};" MATCHES ";${data_name};")
-        set(data_file
-            ${CMAKE_CURRENT_BINARY_DIR}/suites/test_suite_${data_name}.data)
-        set(dependency test_suite_bignum_generated_data)
-    elseif(";${config_generated_data_names};" MATCHES ";${data_name};")
-        set(data_file
-            ${CMAKE_CURRENT_BINARY_DIR}/suites/test_suite_${data_name}.data)
-        set(dependency test_suite_tf_psa_crypto_config_generated_data)
-    elseif(";${ecp_generated_data_names};" MATCHES ";${data_name};")
-        set(data_file
-            ${CMAKE_CURRENT_BINARY_DIR}/suites/test_suite_${data_name}.data)
-        set(dependency test_suite_ecp_generated_data)
-    elseif(";${psa_generated_data_names};" MATCHES ";${data_name};")
-        set(data_file
-            ${CMAKE_CURRENT_BINARY_DIR}/suites/test_suite_${data_name}.data)
-        set(dependency test_suite_psa_generated_data)
-    else()
-        set(data_file
-            ${CMAKE_CURRENT_SOURCE_DIR}/suites/test_suite_${data_name}.data)
-        set(dependency
-            test_suite_bignum_generated_data
-            test_suite_tf_psa_crypto_config_generated_data
-            test_suite_ecp_generated_data
-            test_suite_psa_generated_data)
-    endif()
+function(add_test_suite function_name data_name data_file_path)
+    set(data_file "${data_file_path}/test_suite_${data_name}.data")
 
     add_custom_command(
         OUTPUT
@@ -291,7 +224,17 @@ function(add_test_suite function_name data_name)
                    $<TARGET_OBJECTS:tf_psa_crypto_test>)
     set_base_compile_options(test_suite_${data_name})
     target_compile_options(test_suite_${data_name} PRIVATE ${TEST_C_FLAGS})
-    add_dependencies(test_suite_${data_name} ${dependency})
+
+    if(test_suite_${data_name}.data IN_LIST base_bignum_generated_data_files)
+        add_dependencies(test_suite_${data_name} test_suite_bignum_generated_data)
+    elseif(test_suite_${data_name}.data IN_LIST base_config_generated_data_files)
+        add_dependencies(test_suite_${data_name} test_suite_tf_psa_crypto_config_generated_data)
+    elseif(test_suite_${data_name}.data IN_LIST base_ecp_generated_data_files)
+        add_dependencies(test_suite_${data_name} test_suite_ecp_generated_data)
+    elseif(test_suite_${data_name}.data IN_LIST base_psa_generated_data_files)
+        add_dependencies(test_suite_${data_name} test_suite_psa_generated_data)
+    endif()
+
     target_link_libraries(test_suite_${data_name} ${libs})
     # Include test-specific header files from ./include and private header
     # files (used by some invasive tests) from ../library. Public header
@@ -337,7 +280,14 @@ foreach(test_suite ${test_suites})
     string(REGEX REPLACE "\\.data\$" "" data_name "${data_name}")
     string(REPLACE "test_suite_" "" data_name "${data_name}")
     string(REGEX MATCH "[^.]*" function_name "${data_name}")
-    add_test_suite(${function_name} ${data_name})
+
+    if(test_suite IN_LIST all_generated_data_files)
+        set(data_file_path "${CMAKE_CURRENT_BINARY_DIR}/suites")
+    else()
+        set(data_file_path "${CMAKE_CURRENT_SOURCE_DIR}/suites")
+    endif()
+
+    add_test_suite(${function_name} ${data_name} "${data_file_path}")
 endforeach(test_suite)
 
 # Make scripts and data files needed for testing available in an
