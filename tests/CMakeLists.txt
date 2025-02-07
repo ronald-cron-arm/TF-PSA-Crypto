@@ -190,11 +190,11 @@ string(REGEX REPLACE "[ ,;]" "|" SKIP_TEST_SUITES_REGEX "${SKIP_TEST_SUITES}")
 string(REPLACE "." "\\." SKIP_TEST_SUITES_REGEX "${SKIP_TEST_SUITES_REGEX}")
 set(SKIP_TEST_SUITES_REGEX "^(${SKIP_TEST_SUITES_REGEX})(\$|\\.)")
 
-function(add_test_suite suite_name)
+function(add_test_suite function_name)
     if(ARGV1)
         set(data_name ${ARGV1})
     else()
-        set(data_name ${suite_name})
+        set(data_name ${function_name})
     endif()
 
     # Get the test names of the tests with generated .data files
@@ -274,7 +274,7 @@ function(add_test_suite suite_name)
         COMMAND
             ${TF_PSA_CRYPTO_PYTHON_EXECUTABLE}
             ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/scripts/generate_test_code.py
-            -f ${CMAKE_CURRENT_SOURCE_DIR}/suites/test_suite_${suite_name}.function
+            -f ${CMAKE_CURRENT_SOURCE_DIR}/suites/test_suite_${function_name}.function
             -d ${data_file}
             -t ${CMAKE_CURRENT_SOURCE_DIR}/suites/main_test.function
             -p ${CMAKE_CURRENT_SOURCE_DIR}/suites/host_test.function
@@ -283,7 +283,7 @@ function(add_test_suite suite_name)
             -o .
         DEPENDS
             ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/scripts/generate_test_code.py
-            ${CMAKE_CURRENT_SOURCE_DIR}/suites/test_suite_${suite_name}.function
+            ${CMAKE_CURRENT_SOURCE_DIR}/suites/test_suite_${function_name}.function
             ${data_file}
             ${CMAKE_CURRENT_SOURCE_DIR}/suites/main_test.function
             ${CMAKE_CURRENT_SOURCE_DIR}/suites/host_test.function
