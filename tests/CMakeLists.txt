@@ -55,21 +55,13 @@ execute_process(
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/..
     OUTPUT_VARIABLE
-        base_psa_generated_data_files)
-string(REGEX REPLACE "[^;]*/" ""
-       base_psa_generated_data_files "${base_psa_generated_data_files}")
+        psa_generated_data_files)
+string(REPLACE "tests/" ""
+       psa_generated_data_files "${psa_generated_data_files}")
 
-# Derive generated file paths in the build directory. The generated data
-# files go into the suites/ subdirectory.
-set(base_generated_data_files ${base_psa_generated_data_files})
-string(REGEX REPLACE "([^;]+)" "suites/\\1"
-       all_generated_data_files "${base_generated_data_files}")
-string(PREPEND bignum_generated_data_files config_generated_data_files ecp_generated_data_files)
-
-set(psa_generated_data_files "")
-foreach(file ${base_psa_generated_data_files})
-    list(APPEND psa_generated_data_files ${CMAKE_CURRENT_BINARY_DIR}/suites/${file})
-endforeach()
+set(all_generated_data_files
+    ${bignum_generated_data_files} ${config_generated_data_files}
+    ${ecp_generated_data_files} ${psa_generated_data_files})
 
 if(GEN_FILES)
     add_custom_command(
@@ -160,6 +152,7 @@ add_custom_target(test_suite_bignum_generated_data DEPENDS ${bignum_generated_da
 add_custom_target(test_suite_tf_psa_crypto_config_generated_data DEPENDS ${config_generated_data_files})
 add_custom_target(test_suite_ecp_generated_data DEPENDS ${ecp_generated_data_files})
 add_custom_target(test_suite_psa_generated_data DEPENDS ${psa_generated_data_files})
+
 # If SKIP_TEST_SUITES is not defined with -D, get it from the environment.
 if((NOT DEFINED SKIP_TEST_SUITES) AND (DEFINED ENV{SKIP_TEST_SUITES}))
     set(SKIP_TEST_SUITES $ENV{SKIP_TEST_SUITES})
@@ -212,7 +205,7 @@ function(add_test_suite function_name data_name data_file_path)
         add_dependencies(test_suite_${data_name} test_suite_tf_psa_crypto_config_generated_data)
     elseif("suites/test_suite_${data_name}.data" IN_LIST ecp_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_ecp_generated_data)
-    elseif(test_suite_${data_name}.data IN_LIST base_psa_generated_data_files)
+    elseif("suites/test_suite_${data_name}.data" IN_LIST psa_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_psa_generated_data)
     endif()
 
