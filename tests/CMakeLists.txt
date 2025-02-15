@@ -19,9 +19,9 @@ execute_process(
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/..
     OUTPUT_VARIABLE
-        base_bignum_generated_data_files)
-string(REGEX REPLACE "[^;]*/" ""
-       base_bignum_generated_data_files "${base_bignum_generated_data_files}")
+        bignum_generated_data_files)
+string(REPLACE "tests/" ""
+       bignum_generated_data_files "${bignum_generated_data_files}")
 
 execute_process(
     COMMAND
@@ -69,17 +69,15 @@ string(REGEX REPLACE "[^;]*/" ""
 # Derive generated file paths in the build directory. The generated data
 # files go into the suites/ subdirectory.
 set(base_generated_data_files
-    ${base_bignum_generated_data_files} ${base_config_generated_data_files}
+    ${base_config_generated_data_files}
     ${base_ecp_generated_data_files} ${base_psa_generated_data_files})
 string(REGEX REPLACE "([^;]+)" "suites/\\1"
        all_generated_data_files "${base_generated_data_files}")
-set(bignum_generated_data_files "")
+string(PREPEND bignum_generated_data_files)
+
 set(config_generated_data_files "")
 set(ecp_generated_data_files "")
 set(psa_generated_data_files "")
-foreach(file ${base_bignum_generated_data_files})
-    list(APPEND bignum_generated_data_files ${CMAKE_CURRENT_BINARY_DIR}/suites/${file})
-endforeach()
 foreach(file ${base_config_generated_data_files})
     list(APPEND config_generated_data_files ${CMAKE_CURRENT_BINARY_DIR}/suites/${file})
 endforeach()
@@ -225,7 +223,7 @@ function(add_test_suite function_name data_name data_file_path)
     set_base_compile_options(test_suite_${data_name})
     target_compile_options(test_suite_${data_name} PRIVATE ${TEST_C_FLAGS})
 
-    if(test_suite_${data_name}.data IN_LIST base_bignum_generated_data_files)
+    if("suites/test_suite_${data_name}.data" IN_LIST bignum_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_bignum_generated_data)
     elseif(test_suite_${data_name}.data IN_LIST base_config_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_tf_psa_crypto_config_generated_data)
