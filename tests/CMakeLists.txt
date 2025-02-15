@@ -7,10 +7,10 @@ if(NOT TF_PSA_CRYPTO_PYTHON_EXECUTABLE)
     message(FATAL_ERROR "Cannot build test suites without Python 3")
 endif()
 
-# generated .data files will go there
+# Get paths relative to the current binary directory of the generated data files
+# Paths are of the form "suites/test_suite*.data" as the data files are
+# generated in the "./suites" directory.
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/suites)
-
-# Get base names for generated files
 execute_process(
     COMMAND
         ${TF_PSA_CRYPTO_PYTHON_EXECUTABLE}
@@ -143,11 +143,16 @@ else()
         link_to_source(${file})
     endforeach()
 endif()
-# CMake generates sub-makefiles for each target and calls them in subprocesses.
-# Without this command, cmake will generate rules in each sub-makefile. As a result,
-# they can cause race conditions in parallel builds.
-# With this line, only 4 sub-makefiles include the above command, that reduces
-# the risk of a race.
+# A separate target is created for each test data generation script. Each test
+# suite executable that depends on a generated test data file is then set to
+# depend on the corresponding target. This ensures that a generation script
+# is not executed concurrently for different test suite executables,
+# preventing simultaneous generation of the same files.
+# This precaution is necessary for scripts that generate multiple files. As of
+# this writing, only generate_bignum_tests.py and generate_psa_tests.py fall
+# into this category. However, we apply this approach to all generation scripts
+# to future-proof the system, anticipating that they may eventually generate
+# multiple files.
 add_custom_target(test_suite_bignum_generated_data DEPENDS ${bignum_generated_data_files})
 add_custom_target(test_suite_tf_psa_crypto_config_generated_data DEPENDS ${config_generated_data_files})
 add_custom_target(test_suite_ecp_generated_data DEPENDS ${ecp_generated_data_files})
