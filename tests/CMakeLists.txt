@@ -31,16 +31,9 @@ execute_process(
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/..
     OUTPUT_VARIABLE
-        base_config_generated_data_files_raw)
-string(REGEX REPLACE "[^;]*/" ""
-       base_config_generated_data_files_raw
-       "${base_config_generated_data_files_raw}")
-# Can be replace by list(FILTER ...) when CI CMake version is >=3.6
-foreach(file ${base_config_generated_data_files_raw})
-    if(${file} MATCHES "psa")
-        list(APPEND base_config_generated_data_files ${file})
-    endif()
-endforeach()
+        config_generated_data_files)
+string(REPLACE "tests/" ""
+       config_generated_data_files "${config_generated_data_files}")
 
 execute_process(
     COMMAND
@@ -69,18 +62,13 @@ string(REGEX REPLACE "[^;]*/" ""
 # Derive generated file paths in the build directory. The generated data
 # files go into the suites/ subdirectory.
 set(base_generated_data_files
-    ${base_config_generated_data_files}
     ${base_ecp_generated_data_files} ${base_psa_generated_data_files})
 string(REGEX REPLACE "([^;]+)" "suites/\\1"
        all_generated_data_files "${base_generated_data_files}")
-string(PREPEND bignum_generated_data_files)
+string(PREPEND bignum_generated_data_files config_generated_data_files)
 
-set(config_generated_data_files "")
 set(ecp_generated_data_files "")
 set(psa_generated_data_files "")
-foreach(file ${base_config_generated_data_files})
-    list(APPEND config_generated_data_files ${CMAKE_CURRENT_BINARY_DIR}/suites/${file})
-endforeach()
 foreach(file ${base_ecp_generated_data_files})
     list(APPEND ecp_generated_data_files ${CMAKE_CURRENT_BINARY_DIR}/suites/${file})
 endforeach()
@@ -225,7 +213,7 @@ function(add_test_suite function_name data_name data_file_path)
 
     if("suites/test_suite_${data_name}.data" IN_LIST bignum_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_bignum_generated_data)
-    elseif(test_suite_${data_name}.data IN_LIST base_config_generated_data_files)
+    elseif("suites/test_suite_${data_name}.data" IN_LIST config_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_tf_psa_crypto_config_generated_data)
     elseif(test_suite_${data_name}.data IN_LIST base_ecp_generated_data_files)
         add_dependencies(test_suite_${data_name} test_suite_ecp_generated_data)
