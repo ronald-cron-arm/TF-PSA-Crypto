@@ -22,6 +22,15 @@ if(GEN_FILES)
             ${TF_PSA_CRYPTO_DIR}/scripts/data_files/driver_templates/psa_crypto_driver_wrappers.h.jinja
             ${TF_PSA_CRYPTO_DIR}/scripts/data_files/driver_templates/psa_crypto_driver_wrappers_no_static.c.jinja
     )
+    add_custom_target(tf_psa_crypto_driver_wrappers
+        DEPENDS
+            ${CMAKE_CURRENT_BINARY_DIR}/psa_crypto_driver_wrappers.h
+            ${CMAKE_CURRENT_BINARY_DIR}/psa_crypto_driver_wrappers_no_static.c
+    )
+    register_generated_files(
+        "core/"
+        "psa_crypto_driver_wrappers.h;psa_crypto_driver_wrappers_no_static.c"
+    )
 else()
     link_to_source(psa_crypto_driver_wrappers.h)
     link_to_source(psa_crypto_driver_wrappers_no_static.c)

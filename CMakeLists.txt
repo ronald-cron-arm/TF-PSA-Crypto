@@ -366,6 +366,16 @@ if(CMAKE_BUILD_TYPE STREQUAL "Check" AND TEST_CPP)
     endif()
 endif()
 
+if(GEN_FILES)
+    function(register_generated_files prefix paths)
+        foreach(path ${paths})
+            set(full_path "${prefix}${path}")
+            set(generated_files ${generated_files} ${full_path})
+        endforeach()
+        cmake_print_variables(generated_files)
+    endfunction(register_generated_files)
+endif()
+
 if (NOT EXISTS "${TF_PSA_CRYPTO_FRAMEWORK_DIR}/CMakeLists.txt")
     message(FATAL_ERROR "${TF_PSA_CRYPTO_FRAMEWORK_DIR}/CMakeLists.txt not found. Run `git submodule update --init` from the source tree to fetch the submodule contents.")
 endif()
@@ -413,6 +423,7 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
         add_custom_target(tf_psa_crypto_test_keys_header
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/include/test/test_keys.h)
         add_dependencies(tf_psa_crypto_test tf_psa_crypto_test_keys_header)
+        register_generated_files("" "tests/include/test/test_keys.h")
     endif()
 
     file(WRITE

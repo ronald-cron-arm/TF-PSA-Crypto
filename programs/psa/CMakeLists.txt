@@ -39,6 +39,7 @@ if(GEN_FILES)
     add_custom_target(generate_psa_constant_names_generated_c
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/psa_constant_names_generated.c)
     add_dependencies(psa_constant_names generate_psa_constant_names_generated_c)
+    register_generated_files("" "programs/psa/psa_constant_names_generated.c")
 endif()
 
 install(TARGETS ${executables}

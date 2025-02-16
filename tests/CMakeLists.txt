@@ -137,7 +137,6 @@ if(GEN_FILES)
             ${CMAKE_CURRENT_SOURCE_DIR}/../include/psa/crypto_values.h
             ${CMAKE_CURRENT_SOURCE_DIR}/../include/psa/crypto_extra.h
     )
-
 else()
     foreach(file ${all_generated_data_files})
         link_to_source(${file})
@@ -157,6 +156,10 @@ add_custom_target(test_suite_bignum_generated_data DEPENDS ${bignum_generated_da
 add_custom_target(test_suite_tf_psa_crypto_config_generated_data DEPENDS ${config_generated_data_files})
 add_custom_target(test_suite_ecp_generated_data DEPENDS ${ecp_generated_data_files})
 add_custom_target(test_suite_psa_generated_data DEPENDS ${psa_generated_data_files})
+register_generated_files("tests/" "${bignum_generated_data_files}")
+register_generated_files("tests/" "${config_generated_data_files}")
+register_generated_files("tests/" "${ecp_generated_data_files}")
+register_generated_files("tests/" "${psa_generated_data_files}")
 
 # If SKIP_TEST_SUITES is not defined with -D, get it from the environment.
 if((NOT DEFINED SKIP_TEST_SUITES) AND (DEFINED ENV{SKIP_TEST_SUITES}))
