@@ -367,12 +367,18 @@ if(CMAKE_BUILD_TYPE STREQUAL "Check" AND TEST_CPP)
 endif()
 
 if(GEN_FILES)
+    add_custom_target(tf_psa_crypto_generated_files
+        COMMAND ${CMAKE_COMMAND} -E echo "$<JOIN:$<TARGET_PROPERTY:tf_psa_crypto_generated_files,GENERATED_FILES>, >"
+        VERBATIM
+    )
+
     function(register_generated_files prefix paths)
         foreach(path ${paths})
             set(full_path "${prefix}${path}")
             set(generated_files ${generated_files} ${full_path})
         endforeach()
-        cmake_print_variables(generated_files)
+        get_property(already_registered_generated_files TARGET tf_psa_crypto_generated_files PROPERTY GENERATED_FILES)
+        set_property(TARGET tf_psa_crypto_generated_files PROPERTY GENERATED_FILES ${already_registered_generated_files} ${generated_files})
     endfunction(register_generated_files)
 endif()
 
