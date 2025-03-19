@@ -21,6 +21,11 @@ if(USE_SHARED_TF_PSA_CRYPTO_LIBRARY AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "[Ww][I
     target_link_libraries(tfpsacrypto_dlopen PRIVATE ${CMAKE_DL_LIBS} ${tfpsacrypto_target})
 endif()
 
+# selftest
+tfpsacrypto_build_program_common(selftest)
+target_sources(selftest PRIVATE $<TARGET_OBJECTS:tf_psa_crypto_test>)
+target_link_libraries(selftest PRIVATE ${tfpsacrypto_target} ${CMAKE_THREAD_LIBS_INIT})
+
 install(TARGETS ${executables}
         DESTINATION "bin"
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
