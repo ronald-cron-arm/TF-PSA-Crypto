@@ -159,6 +159,10 @@
  */
 #include "mbedtls/private/config_psa.h"
 
+#if defined(TF_PSA_CRYPTO_TEST_LIBTESTDRIVER1)
+#include "libtestdriver1/private/config_adjust_legacy_from_psa.h"
+#endif
+
 #include "mbedtls/config_adjust_legacy_crypto.h"
 
 /* Indicate that all configuration symbols are set,

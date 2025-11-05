@@ -183,6 +183,8 @@ foreach(target IN LISTS target_libraries)
                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
         PRIVATE ${TF_PSA_CRYPTO_DIR}/core
                 ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src
+                ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/include
+                ${TF_PSA_CRYPTO_DIR}/tests/include/test
                 # Needed to include psa_crypto_driver_wrappers.h
                 ${CMAKE_CURRENT_BINARY_DIR})
     tf_psa_crypto_set_config_files_compile_definitions(${target})
