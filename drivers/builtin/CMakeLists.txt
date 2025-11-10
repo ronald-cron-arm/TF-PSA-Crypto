@@ -1,5 +1,3 @@
-add_subdirectory(src)
-
 file(GLOB src_builtin RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.c)
 
 if(CMAKE_COMPILER_IS_GNUCC)
