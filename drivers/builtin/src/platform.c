@@ -387,6 +387,10 @@ int mbedtls_platform_setup(mbedtls_platform_context *ctx)
 {
     (void) ctx;
 
+    mbedtls_platform_set_snprintf(snprintf);
+    mbedtls_platform_set_fprintf(fprintf);
+    mbedtls_platform_set_exit(exit);
+
     return 0;
 }
 

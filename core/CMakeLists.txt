@@ -7,6 +7,7 @@ set(src_crypto
     psa_its_file.c
     tf_psa_crypto_config.c
     tf_psa_crypto_version.c
+    custom_zeroize.c
 )
 
 if(GEN_FILES)
