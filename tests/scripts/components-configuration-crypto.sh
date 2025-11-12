@@ -81,3 +81,18 @@ component_test_accel_ecdsa() {
     msg "test: accelerated ECDSA"
     ctest
 }
+
+component_test_accel_ecdh() {
+    msg "build: accelerated ECDH"
+    cd $OUT_OF_SOURCE_DIR
+
+    cmake -DTF_PSA_CRYPTO_TEST_DRIVER=On \
+          -DTF_PSA_CRYPTO_USER_CONFIG_FILE="../tests/configs/user-config-accel-ecdh.h" ..
+    make
+
+    # Make sure built-in ECDH was not re-enabled by accident (additive config)
+    not grep mbedtls_ecdh_ ${BUILTIN_BUILD_DIR}/ecdh.c.o
+
+    msg "test: accelerated ECDH"
+    ctest
+}
