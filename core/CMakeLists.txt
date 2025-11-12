@@ -172,11 +172,14 @@ endif(USE_SHARED_TF_PSA_CRYPTO_LIBRARY)
 
 foreach(target IN LISTS target_libraries)
     add_library(TF-PSA-Crypto::${target} ALIAS ${target})  # add_subdirectory support
+    set(drivers_include_dirs "")
+    foreach(driver_include ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS})
+        list(APPEND drivers_include_dirs
+             "$<BUILD_INTERFACE:${driver_include}>")
+    endforeach()
     target_include_directories(${target}
         PUBLIC $<BUILD_INTERFACE:${TF_PSA_CRYPTO_DIR}/include/>
-               $<BUILD_INTERFACE:${TF_PSA_CRYPTO_DIR}/drivers/builtin/include/>
-               $<BUILD_INTERFACE:${TF_PSA_CRYPTO_DIR}/drivers/everest/include/>
-               $<BUILD_INTERFACE:${TF_PSA_CRYPTO_DIR}/drivers/p256-m/>
+               ${drivers_include_dirs}
                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
         PRIVATE ${TF_PSA_CRYPTO_DIR}/core
                 ${TF_PSA_CRYPTO_DIR}/drivers/builtin/src

@@ -18,7 +18,7 @@ foreach (target IN LISTS target_libraries)
     target_include_directories(${target}
       PRIVATE include
               ${TF_PSA_CRYPTO_DIR}/include
-              ${TF_PSA_CRYPTO_DIR}/drivers/builtin/include
+              ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS}
               include/tf-psa-crypto/private/everest
               include/tf-psa-crypto/private/everest/kremlib
               ${TF_PSA_CRYPTO_DIR}/core)

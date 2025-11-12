@@ -19,8 +19,7 @@ foreach (target IN LISTS target_libraries)
       PRIVATE p256-m
               ${TF_PSA_CRYPTO_DIR}/include
               ${TF_PSA_CRYPTO_DIR}/core
-              ${TF_PSA_CRYPTO_DIR}/drivers/builtin/include
-              ${TF_PSA_CRYPTO_DIR}/drivers/everest/include)
+              ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS})
     tf_psa_crypto_set_config_files_compile_definitions(${target})
 endforeach(target)
 
