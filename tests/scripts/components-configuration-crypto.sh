@@ -96,3 +96,21 @@ component_test_accel_ecdh() {
     msg "test: accelerated ECDH"
     ctest
 }
+
+component_test_accel_rsa() {
+    msg "build: accelerated RSA"
+
+    ./scripts/config.py full
+
+    cd $OUT_OF_SOURCE_DIR
+
+    cmake -DTF_PSA_CRYPTO_TEST_DRIVER=On \
+          -DTF_PSA_CRYPTO_USER_CONFIG_FILE="../tests/configs/user-config-accel-rsa.h" ..
+    make
+
+    # Make sure built-in RSA was not re-enabled by accident (additive config)
+    not grep mbedtls_ecdh_ ${BUILTIN_BUILD_DIR}/rsa.c.o
+
+    msg "test: accelerated RSA"
+    ctest
+}
