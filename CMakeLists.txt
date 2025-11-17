@@ -111,6 +111,7 @@ if(CMAKE_COMPILER_IS_MSVC)
 else()
     option(ENABLE_TESTING "Build TF-PSA-Crypto tests." ON)
 endif()
+option(TF_PSA_CRYPTO_TEST_DRIVER "Build TF-PSA-Crypto test driver for driver dispatch testing" OFF)
 
 option(USE_STATIC_TF_PSA_CRYPTO_LIBRARY "Build TF-PSA-Crypto static library." ON)
 option(USE_SHARED_TF_PSA_CRYPTO_LIBRARY "Build TF-PSA-Crypto shared library." OFF)
@@ -391,6 +392,9 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
         add_custom_target(tf_psa_crypto_test_keys_header
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/include/test/test_keys.h)
         add_dependencies(tf_psa_crypto_test tf_psa_crypto_test_keys_header)
+        if(TF_PSA_CRYPTO_TEST_DRIVER)
+            add_dependencies(tf_psa_crypto_test tf_psa_crypto_test_driver_src)
+        endif()
     endif()
 
     file(WRITE
