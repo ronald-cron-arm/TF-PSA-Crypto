@@ -10,6 +10,7 @@ Generate a TF-PSA-Crypto test driver
 """
 import argparse
 import fnmatch
+import re
 import shutil
 import sys
 
@@ -75,6 +76,26 @@ def create_test_driver_tree(builtin: Path, src_relpaths: List[Path], test_driver
         shutil.copy2(builtin / src_relpath, dst)
     return
 
+def rewrite_includes_in_file(file: Path, headers: List[str], driver: str):
+    include_line_re = re.compile(
+        r'^\s*#\s*include\s*([<"])\s*mbedtls/([^>"]+)\s*([>"])', re.MULTILINE
+    )
+    text = file.read_text(encoding="utf-8")
+    changed = False
+
+    def repl(m: re.Match) -> str:
+        nonlocal changed
+        header = m.group(2)
+        if header in headers:
+            changed = True
+            return f'#include {m.group(1)}{driver}/{header}{m.group(3)}'
+        return m.group(0)
+
+    new_text = include_line_re.sub(repl, text)
+    if changed:
+        file.write_text(new_text, encoding="utf-8")
+    return
+
 def main():
     """
     Main function of this program
@@ -125,6 +146,17 @@ def main():
     if test_driver_dir.exists():
         shutil.rmtree(test_driver_dir)
     create_test_driver_tree(builtin, src_relpaths, test_driver_dir)
+
+    #Step 2: Rename test driver include directory and update header inclusions
+    #        accordingly.
+    test_driver_include_dir = test_driver_dir / "include" / args.driver
+    (test_driver_dir / "include" / "mbedtls").rename(test_driver_include_dir)
+    headers = {
+        f.relative_to(test_driver_include_dir).as_posix() \
+        for f in test_driver_include_dir.rglob("*.h")
+    }
+    for f in iter_code_files(test_driver_dir):
+        rewrite_includes_in_file(f, headers, args.driver)
 
 if __name__ == "__main__":
     sys.exit(main())
