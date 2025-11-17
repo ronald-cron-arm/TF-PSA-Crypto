@@ -10,13 +10,16 @@ Generate a TF-PSA-Crypto test driver
 """
 import argparse
 import fnmatch
+import itertools
 import re
 import shutil
+import subprocess
 import sys
 
+from config import TFPSACryptoConfig
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Set
 
 import framework_scripts_path # pylint: disable=unused-import
 from mbedtls_framework import build_tree
@@ -96,6 +99,40 @@ def rewrite_includes_in_file(file: Path, headers: List[str], driver: str):
         file.write_text(new_text, encoding="utf-8")
     return
 
+def run_ctags(files: Iterable[Path]) -> Set[str]:
+    result = subprocess.run(
+        ["ctags", "-x", "--language-force=C", "--c-kinds=defgpstuv"] + \
+        [str(f) for f in files],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    identifiers = set()
+    for line in result.stdout.splitlines():
+        identifiers.add(line.split()[0])
+
+    return identifiers
+
+def get_external_identifiers() -> Set[str]:
+    """
+    Get from public and core headers the identifiers that the driver built-in
+    code may reference but does not define.
+    """
+    directories = ( "core", "include" )
+    files = itertools.chain.from_iterable(Path(directory).rglob("*.h") \
+                                          for directory in directories)
+    identifiers = run_ctags(files)
+
+    # MBEDTLS_PRIVATE is returned as a prototype by ctags when used in
+    # structure members. Just remove it.
+    identifiers.remove("MBEDTLS_PRIVATE")
+
+    # ctags ignores the configuration options that are commented in
+    # crypto_config.h. Ensure we have all of them.
+    identifiers |= set(TFPSACryptoConfig().settings)
+
+    return identifiers
+
 def main():
     """
     Main function of this program
@@ -157,6 +194,10 @@ def main():
     }
     for f in iter_code_files(test_driver_dir):
         rewrite_includes_in_file(f, headers, args.driver)
+
+    #Step 3: Get from public and core headers the set of identifiers that the
+    #        driver built-in code may reference but do not define.
+    external_identifiers = get_external_identifiers()
 
 if __name__ == "__main__":
     sys.exit(main())
