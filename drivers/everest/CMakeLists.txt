@@ -23,6 +23,9 @@ foreach (target IN LISTS target_libraries)
               include/tf-psa-crypto/private/everest/kremlib
               ${TF_PSA_CRYPTO_DIR}/core)
     tf_psa_crypto_set_config_files_compile_definitions(${target})
+    if(TF_PSA_CRYPTO_TEST_DRIVER)
+        add_dependencies(${target} tf_psa_crypto_test_driver_src)
+    endif()
 endforeach(target)
 
 if(USE_SHARED_TF_PSA_CRYPTO_LIBRARY)

@@ -3,7 +3,6 @@ set(drivers
     everest
     p256-m
 )
-set(TF_PSA_CRYPTO_DRIVERS "${drivers}" PARENT_SCOPE)
 
 # Drivers currently depend on each other through the indirect inclusion of
 # `crypto_driver_contexts_*.h` headers, so all driver include paths must be
@@ -24,6 +23,22 @@ if(CMAKE_COMPILER_IS_MSVC)
             string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
         endforeach(flag_var)
     endif()
+endif()
+
+if(TF_PSA_CRYPTO_TEST_DRIVER)
+    # Use `libtestdriver1` as the driver name to align with the name used in
+    # Mbed TLS. This allows to reuse most of the test driver code as it is.
+    list(APPEND drivers libtestdriver1)
+    list(APPEND TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1/include)
+
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1)
+    configure_file(
+        ${PROJECT_SOURCE_DIR}/tests/scripts/libtestdriver1.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1/CMakeLists.txt
+        COPYONLY
+    )
+    add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1
+                     ${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1)
 endif()
 
 # Lists of driver targets.
@@ -57,6 +72,8 @@ if (USE_STATIC_TF_PSA_CRYPTO_LIBRARY)
         endforeach()
     endif()
 endif()
+
+set(TF_PSA_CRYPTO_DRIVERS "${drivers}" PARENT_SCOPE)
 set(TF_PSA_CRYPTO_DRIVER_STATIC_TARGETS "${driver_static_targets}" PARENT_SCOPE)
 set(TF_PSA_CRYPTO_DRIVER_TARGETS "${driver_targets}" PARENT_SCOPE)
 
