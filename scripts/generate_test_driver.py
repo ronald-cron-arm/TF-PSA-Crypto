@@ -133,6 +133,63 @@ def get_external_identifiers() -> Set[str]:
 
     return identifiers
 
+def prefix_identifiers_in_file(file: Path, identifiers: Set[str], driver: str):
+    identifier_re = re.compile(r"\b[A-Za-z_][A-Za-z0-9_]*\b")
+
+    text = file.read_text(encoding="utf-8")
+    changed = False
+
+    def repl(m: re.Match) -> str:
+        nonlocal changed
+        identifier = m.group(0)
+        if identifier in identifiers:
+            changed = True
+            prefix = driver.upper() if identifier[0].isupper() else driver.lower()
+            return f"{prefix}_{identifier}"
+        return identifier
+
+    new_text = identifier_re.sub(repl, text)
+    if changed:
+        file.write_text(new_text, encoding="utf-8")
+    return
+
+def prefix_test_driver_identifiers(test_driver_dir: Path, driver: str,
+                                   external_identifiers: Set[str]):
+    prefixes = (
+        "MBEDTLS_",
+        "PSA_",
+        "TF_PSA_CRYPTO_",
+        "mbedtls_",
+        "psa_",
+        "tf_psa_crypto_",
+    )
+
+    identifiers = run_ctags(iter_code_files(test_driver_dir))
+    identifiers_to_prefix = set()
+    for identifier in identifiers:
+        if any(identifier.startswith(prefix) for prefix in prefixes) and \
+           identifier not in external_identifiers:
+            identifiers_to_prefix.add(identifier)
+
+    forced_identifiers = {
+        "MBEDTLS_AESCE_C",
+        "MBEDTLS_AESNI_C",
+        "MBEDTLS_ECP_NIST_OPTIM",
+        "MBEDTLS_ECP_RESTARTABLE",
+    }
+
+    for identifier in forced_identifiers:
+        identifiers_to_prefix.add(identifier)
+
+    for identifier in external_identifiers:
+        if identifier.startswith("PSA_WANT_"):
+            identifiers_to_prefix.add(identifier.replace("PSA_WANT_", "MBEDTLS_PSA_ACCEL_", 1))
+
+    for f in iter_code_files(test_driver_dir):
+        prefix_identifiers_in_file(f, identifiers_to_prefix, driver)
+
+    return
+
 def main():
     """
     Main function of this program
@@ -198,6 +255,9 @@ def main():
     #Step 3: Get from public and core headers the set of identifiers that the
     #        driver built-in code may reference but do not define.
     external_identifiers = get_external_identifiers()
+
+    #Step 4
+    prefix_test_driver_identifiers(test_driver_dir, args.driver, external_identifiers)
 
 if __name__ == "__main__":
     sys.exit(main())
