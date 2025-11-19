@@ -86,11 +86,6 @@
 #define MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_KEY_TYPES_BASIC
 #endif
 
-/* Special case: we don't support cooked key derivation in drivers yet */
-#if defined(MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR_DERIVE)
-#undef MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR_DERIVE
-#endif
-
 /* Note: the condition about key derivation is always true as DERIVE can't be
  * accelerated yet */
 #if (defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY) && \
