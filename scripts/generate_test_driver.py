@@ -10,6 +10,7 @@ Generate a TF-PSA-Crypto test driver
 """
 import argparse
 import fnmatch
+import shutil
 import sys
 
 from fnmatch import fnmatch
@@ -67,6 +68,13 @@ def get_dst_relpaths(src_relpaths: List[Path], driver: str) -> List[Path]:
 
     return out
 
+def create_test_driver_tree(builtin: Path, src_relpaths: List[Path], test_driver_dir: Path):
+    for src_relpath in src_relpaths:
+        dst = test_driver_dir / src_relpath
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(builtin / src_relpath, dst)
+    return
+
 def main():
     """
     Main function of this program
@@ -111,6 +119,12 @@ def main():
             f.write(f"set({args.driver}_output_c_files " + \
                      " ".join(str(args.driver / path) for path in src_relpaths if path.suffix == ".c") + ")")
         return
+
+    #Step 1: Copy selected builtin source files to <dst_dir>/<driver>
+    test_driver_dir = Path(args.dst_dir) / args.driver
+    if test_driver_dir.exists():
+        shutil.rmtree(test_driver_dir)
+    create_test_driver_tree(builtin, src_relpaths, test_driver_dir)
 
 if __name__ == "__main__":
     sys.exit(main())
