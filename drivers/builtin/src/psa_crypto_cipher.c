@@ -20,6 +20,12 @@
 
 #include <string.h>
 
+#if defined(MBEDTLS_PSA_BUILTIN_CIPHER) || \
+    defined(MBEDTLS_PSA_BUILTIN_AEAD) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_AES) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ARIA) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_CAMELLIA) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_CHACHA20)
 /* mbedtls_cipher_values_from_psa() below only checks if the proper build symbols
  * are enabled, but it does not provide any compatibility check between them
  * (i.e. if the specified key works with the specified algorithm). This helper
@@ -224,6 +230,12 @@ psa_status_t mbedtls_cipher_values_from_psa(
 
     return mbedtls_cipher_validate_values(alg, key_type);
 }
+#endif /* MBEDTLS_PSA_BUILTIN_CIPHER) ||
+          MBEDTLS_PSA_BUILTIN_AEAD ||
+          MBEDTLS_PSA_BUILTIN_KEY_TYPE_AES ||
+          MBEDTLS_PSA_BUILTIN_KEY_TYPE_ARIA ||
+          MBEDTLS_PSA_BUILTIN_KEY_TYPE_CAMELLIA ||
+          MBEDTLS_PSA_BUILTIN_KEY_TYPE_CHACHA20 */
 
 #if defined(MBEDTLS_CIPHER_C)
 const mbedtls_cipher_info_t *mbedtls_cipher_info_from_psa(
