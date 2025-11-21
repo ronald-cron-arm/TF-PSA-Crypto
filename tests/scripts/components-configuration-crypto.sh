@@ -97,6 +97,22 @@ component_test_accel_ecdh() {
     ctest
 }
 
+component_test_accel_jpake() {
+    msg "build: full with accelerated JPAKE"
+    ./scripts/config.py full
+    cd $OUT_OF_SOURCE_DIR
+
+    cmake -DTF_PSA_CRYPTO_TEST_DRIVER=On \
+          -DTF_PSA_CRYPTO_USER_CONFIG_FILE="../tests/configs/user-config-accel-jpake.h" ..
+    make
+
+    # Make sure built-in ECDH was not re-enabled by accident (additive config)
+    not grep mbedtls_ecjpake_init ${BUILTIN_BUILD_DIR}/ecjpake.c.o
+
+    msg "test: full with accelerated JPAKE"
+    ctest
+}
+
 component_test_accel_rsa() {
     msg "build: accelerated RSA"
 
