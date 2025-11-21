@@ -9,7 +9,7 @@
 #### Configuration Testing - Crypto
 ################################################################
 
-BUILTIN_BUILD_DIR="drivers/builtin/CMakeFiles/builtin.dir/src"
+export BUILTIN_BUILD_DIR="drivers/builtin/CMakeFiles/builtin.dir/src"
 
 component_test_accel_all_ecc () {
     msg "build: full + all ECC accelerated"
@@ -110,6 +110,31 @@ component_test_accel_jpake() {
     not grep mbedtls_ecjpake_init ${BUILTIN_BUILD_DIR}/ecjpake.c.o
 
     msg "test: full with accelerated JPAKE"
+    ctest
+}
+
+component_test_accel_ecc_some_key_types () {
+    msg "build: full with accelerated EC algs and some key types"
+    ./scripts/config.py full
+
+    # Restartable feature is not yet supported by PSA. Once it will in
+    # the future, the following line could be removed (see issues
+    # 6061, 6332 and following ones)
+    scripts/config.py unset MBEDTLS_ECP_RESTARTABLE
+
+    cd $OUT_OF_SOURCE_DIR
+
+    cmake -DTF_PSA_CRYPTO_TEST_DRIVER=On \
+          -DTF_PSA_CRYPTO_USER_CONFIG_FILE="../tests/configs/user-config-accel-ecc-some-key-types.h" ..
+    make
+
+    # ECP should be enabled but not the others
+    not grep mbedtls_ecdh ${BUILTIN_BUILD_DIR}/ecdh.c.o
+    not grep mbedtls_ecdsa ${BUILTIN_BUILD_DIR}/ecdsa.c.o
+    not grep mbedtls_ecjpake  ${BUILTIN_BUILD_DIR}/ecjpake.c.o
+    grep mbedtls_ecp ${BUILTIN_BUILD_DIR}/ecp.c.o
+
+    msg "test suites: full with accelerated EC algs and some key types"
     ctest
 }
 
