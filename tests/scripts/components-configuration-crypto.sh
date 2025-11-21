@@ -48,6 +48,34 @@ component_test_accel_all_ecc () {
     ctest
 }
 
+component_test_accel_aead () {
+    msg "test: accelerated AEAD"
+
+    # Configure
+    # ---------
+    ./scripts/config.py full
+    # Disable CCM_STAR_NO_TAG because this re-enables CCM_C.
+    scripts/config.py unset PSA_WANT_ALG_CCM_STAR_NO_TAG
+
+    # Build
+    # -----
+    cd $OUT_OF_SOURCE_DIR
+    cmake -DTF_PSA_CRYPTO_TEST_DRIVER=On \
+          -DTF_PSA_CRYPTO_USER_CONFIG_FILE="../tests/configs/user-config-accel-aead.h" ..
+    make
+
+    # Make sure this was not re-enabled by accident (additive config)
+    not grep mbedtls_ccm ${BUILTIN_BUILD_DIR}/ccm.c.o
+    not grep mbedtls_gcm ${BUILTIN_BUILD_DIR}/gcm.c.o
+    not grep mbedtls_chachapoly ${BUILTIN_BUILD_DIR}/chachapoly.c.o
+
+    # Run the tests
+    # -------------
+
+    msg "test: accelerated AEAD"
+    ctest
+}
+
 component_test_accel_hash () {
     msg "test: accelerated hash"
     cd $OUT_OF_SOURCE_DIR
