@@ -142,8 +142,6 @@
  *   still depends on ECP_LIGHT.
  */
 #if defined(MBEDTLS_ECP_C) || \
-    defined(MBEDTLS_PK_PARSE_EC_EXTENDED) || \
-    defined(MBEDTLS_PK_PARSE_EC_COMPRESSED) || \
     defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_KEY_PAIR_DERIVE)
 #define MBEDTLS_ECP_LIGHT
 #endif

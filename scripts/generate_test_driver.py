@@ -174,6 +174,7 @@ def prefix_test_driver_identifiers(test_driver_dir: Path, driver: str,
     forced_identifiers = {
         "MBEDTLS_AESCE_C",
         "MBEDTLS_AESNI_C",
+        "MBEDTLS_ECP_LIGHT",
         "MBEDTLS_ECP_NIST_OPTIM",
         "MBEDTLS_ECP_RESTARTABLE",
     }
