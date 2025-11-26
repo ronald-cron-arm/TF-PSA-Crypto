@@ -159,6 +159,10 @@
  * accelerated. */
 #include "mbedtls/private/crypto_adjust_config_enable_builtins.h"
 
+#if defined(TF_PSA_CRYPTO_TEST_LIBTESTDRIVER1)
+#include "libtestdriver1/private/crypto_adjust_config_enable_builtins.h"
+#endif
+
 /* Special header to adjust the configuration to make a build
  * where all enabled mechanisms are provided both as built-in and
  * through drivers. See the comment at the top of the
@@ -173,6 +177,10 @@
 
 /* Define additional symbols used by built-in crypto modules. */
 #include "mbedtls/private/crypto_adjust_config_tweak_builtins.h"
+
+#if defined(TF_PSA_CRYPTO_TEST_LIBTESTDRIVER1)
+#include "libtestdriver1/private/crypto_adjust_config_tweak_builtins.h"
+#endif
 
 /* Indicate that all configuration symbols are set,
  * even the ones that are calculated programmatically.
