@@ -8,6 +8,7 @@
 """
 Generate a TF-PSA-Crypto test driver
 """
+import itertools
 import sys
 
 from fnmatch import fnmatch
@@ -17,6 +18,8 @@ from typing import Iterable, List, Set
 import scripts_path # pylint: disable=unused-import
 from mbedtls_framework import build_tree
 from mbedtls_framework import test_driver
+
+from config import TFPSACryptoConfig
 
 EXCLUDE_FILES = {
     "asn1*",
@@ -31,6 +34,15 @@ EXCLUDE_FILES = {
     "pk*",
     "platform*",
     "threading*",
+}
+
+IDENTIFIER_PREFIXES = {
+    "MBEDTLS_",
+    "PSA_",
+    "TF_PSA_CRYPTO_",
+    "mbedtls_",
+    "psa_",
+    "tf_psa_crypto_",
 }
 
 def iter_code_files(root: Path) -> Iterable[Path]:
@@ -77,6 +89,28 @@ def get_dst_relpaths(src_relpaths: List[Path], driver: str) -> List[Path]:
 
     return out
 
+def get_external_identifiers() -> Set[str]:
+    """
+    Get from public and core headers the identifiers that the driver built-in
+    code may reference but does not define.
+    """
+    directories = ("core", "include")
+    files = itertools.chain.from_iterable(Path(directory).rglob("*.h") \
+                                          for directory in directories)
+    identifiers = set()
+    for file in files:
+        identifiers.update(test_driver.run_ctags(file))
+
+    # MBEDTLS_PRIVATE is returned as a prototype by ctags when used in
+    # structure members. Just remove it.
+    identifiers.remove("MBEDTLS_PRIVATE")
+
+    # ctags ignores the configuration options that are commented in
+    # crypto_config.h. Ensure we have all of them.
+    identifiers |= set(TFPSACryptoConfig().settings)
+
+    return identifiers
+
 def main():
     """
     Main function of this program
@@ -117,10 +151,31 @@ def main():
                     for path in src_relpaths if path.suffix == ".c") + ")")
         return
 
-
     #Step 1: Build the test driver tree from `drivers/builtin`
     generator = test_driver.TestDriverGenerator(dst_dir, args.driver)
     generator.build_tree(builtin, EXCLUDE_FILES)
+
+    #Step 2: Prefix the identifiers exposed by the built-in driver.
+    identifiers = generator.get_identifiers_with_prefixes(IDENTIFIER_PREFIXES)
+    external_identifiers = get_external_identifiers()
+    identifiers.difference_update(external_identifiers)
+
+    # MBEDTLS_ECP_LIGHT is defined in tf-psa-crypto/private/crypto_adjust_config_support.h
+    # if MBEDTLS_PK_PARSE_EC_EXTENDED or MBEDTLS_PK_PARSE_EC_COMPRESSED is enabled.
+    # It thus appears in 'external_identifiers' but is a built-in driver identifier
+    # that should be renamed thus force its renaming.
+    identifiers.add("MBEDTLS_ECP_LIGHT")
+
+    # MBEDTLS_PSA_ACCEL_ are not defined in the code base. They are supposed to
+    # be passed as extra configuration options. We want to prefix them,
+    # especially in 'crypto_adjust_config_enable_builtins.h', thus deduce them
+    # from the PSA_WANT_ ones and add them to the list of identifiers to
+    # prefix in the test driver code.
+    for identifier in external_identifiers:
+        if identifier.startswith("PSA_WANT_"):
+            identifiers.add(identifier.replace("PSA_WANT_", "MBEDTLS_PSA_ACCEL_", 1))
+
+    generator.prefix_identifiers(identifiers)
 
 if __name__ == "__main__":
     sys.exit(main())
