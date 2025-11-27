@@ -117,5 +117,10 @@ def main():
                     for path in src_relpaths if path.suffix == ".c") + ")")
         return
 
+
+    #Step 1: Build the test driver tree from `drivers/builtin`
+    generator = test_driver.TestDriverGenerator(dst_dir, args.driver)
+    generator.build_tree(builtin, EXCLUDE_FILES)
+
 if __name__ == "__main__":
     sys.exit(main())
