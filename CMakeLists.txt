@@ -348,9 +348,15 @@ if (NOT EXISTS "${TF_PSA_CRYPTO_FRAMEWORK_DIR}/CMakeLists.txt")
     message(FATAL_ERROR "${TF_PSA_CRYPTO_FRAMEWORK_DIR}/CMakeLists.txt not found. Run `git submodule update --init` from the source tree to fetch the submodule contents.")
 endif()
 
+#
+# `drivers` must be added before `core` because the build of the main library
+# set up in `core` depends on the list of available drivers, which is
+# constructed in `drivers/CMakeLists.txt`. This list may include a generated
+# test driver.
+#
 add_subdirectory(framework)
 add_subdirectory(include)
-add_subdirectory(drivers)
+add_subdirectory(drivers)   # must precede core
 add_subdirectory(core)
 add_subdirectory(pkgconfig)
 
