@@ -404,9 +404,16 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
                 tests/include
                 tests/include/test
                 include
-                ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS}
                 core
                 drivers/builtin/src)
+
+    foreach(driver_target ${TF_PSA_CRYPTO_DRIVER_TARGETS})
+        get_target_property(public_includes ${driver_target} INTERFACE_INCLUDE_DIRECTORIES)
+        if(public_includes)
+            target_include_directories(tf_psa_crypto_test PUBLIC ${public_includes})
+        endif()
+    endforeach()
+
     # Request C11, needed for memory poisoning tests
     set_target_properties(tf_psa_crypto_test PROPERTIES C_STANDARD 11)
     tf_psa_crypto_set_config_files_compile_definitions(tf_psa_crypto_test)

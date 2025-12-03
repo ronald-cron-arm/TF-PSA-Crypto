@@ -16,10 +16,11 @@ foreach (target IN LISTS target_libraries)
     tf_psa_crypto_set_base_compile_options(${target})
 
     target_include_directories(${target}
-      PRIVATE p256-m
-              ${TF_PSA_CRYPTO_DIR}/include
+      PUBLIC p256-m
+      PRIVATE ${TF_PSA_CRYPTO_DIR}/include
               ${TF_PSA_CRYPTO_DIR}/core
-              ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS})
+              ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS}
+    )
     tf_psa_crypto_set_config_files_compile_definitions(${target})
 endforeach(target)
 

@@ -1,4 +1,3 @@
-
 if(CMAKE_COMPILER_IS_GNUCC)
     set(LIBS_C_FLAGS -Wmissing-declarations -Wmissing-prototypes)
 endif(CMAKE_COMPILER_IS_GNUCC)
@@ -35,6 +34,7 @@ foreach (target IN LISTS target_libraries)
     target_compile_options(${target} PRIVATE ${LIBS_C_FLAGS})
 
     target_include_directories(${target}
+      PUBLIC include
       PRIVATE ${TF_PSA_CRYPTO_DIR}/drivers/${tf_psa_crypto_driver}/include
               ${TF_PSA_CRYPTO_DIR}/drivers/${tf_psa_crypto_driver}/src
               ${TF_PSA_CRYPTO_DIR}/include
