@@ -1563,7 +1563,7 @@ static inline psa_status_t psa_driver_wrapper_aead_encrypt(
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 
-            /* If software fallback is compiled in, try fallback */
+            /* Fell through, meaning no accelerator supports this operation */
 #if defined(MBEDTLS_PSA_BUILTIN_AEAD)
             return( mbedtls_psa_aead_encrypt(
                         attributes, key_buffer, key_buffer_size,
@@ -1625,7 +1625,7 @@ static inline psa_status_t psa_driver_wrapper_aead_decrypt(
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 
-            /* If software fallback is compiled in, try fallback */
+            /* Fell through, meaning no accelerator supports this operation */
 #if defined(MBEDTLS_PSA_BUILTIN_AEAD)
             return( mbedtls_psa_aead_decrypt(
                         attributes, key_buffer, key_buffer_size,
@@ -1683,7 +1683,7 @@ static inline psa_status_t psa_driver_wrapper_aead_encrypt_setup(
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 
-            /* If software fallback is compiled in, try fallback */
+            /* Fell through, meaning no accelerator supports this operation */
 #if defined(MBEDTLS_PSA_BUILTIN_AEAD)
             operation->id = PSA_CRYPTO_MBED_TLS_DRIVER_ID;
             status = mbedtls_psa_aead_encrypt_setup(
@@ -1738,7 +1738,7 @@ static inline psa_status_t psa_driver_wrapper_aead_decrypt_setup(
 #endif /* PSA_CRYPTO_DRIVER_TEST */
 #endif /* PSA_CRYPTO_ACCELERATOR_DRIVER_PRESENT */
 
-            /* If software fallback is compiled in, try fallback */
+            /* Fell through, meaning no accelerator supports this operation */
 #if defined(MBEDTLS_PSA_BUILTIN_AEAD)
             operation->id = PSA_CRYPTO_MBED_TLS_DRIVER_ID;
             status = mbedtls_psa_aead_decrypt_setup(
