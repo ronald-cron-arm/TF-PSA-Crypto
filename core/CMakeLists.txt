@@ -108,33 +108,20 @@ if (NOT USE_STATIC_TF_PSA_CRYPTO_LIBRARY AND NOT USE_SHARED_TF_PSA_CRYPTO_LIBRAR
 endif(NOT USE_STATIC_TF_PSA_CRYPTO_LIBRARY AND NOT USE_SHARED_TF_PSA_CRYPTO_LIBRARY)
 
 set(tfpsacrypto_target "${TF_PSA_CRYPTO_TARGET_PREFIX}tfpsacrypto")
-foreach(driver ${TF_PSA_CRYPTO_DRIVERS})
-    set("${driver}_target" "${TF_PSA_CRYPTO_TARGET_PREFIX}${driver}")
-endforeach()
-
 if (USE_STATIC_TF_PSA_CRYPTO_LIBRARY)
     set(tfpsacrypto_static_target ${tfpsacrypto_target})
-    foreach(driver ${TF_PSA_CRYPTO_DRIVERS})
-        set("${driver}_static_target" "${${driver}_target}")
-    endforeach()
 endif()
 
 set(target_libraries ${tfpsacrypto_target})
-
 if(USE_STATIC_TF_PSA_CRYPTO_LIBRARY AND USE_SHARED_TF_PSA_CRYPTO_LIBRARY)
     string(APPEND tfpsacrypto_static_target "_static")
-    foreach(driver ${TF_PSA_CRYPTO_DRIVERS})
-        string(APPEND "${driver}_static_target" "_static")
-    endforeach()
-
-    list(APPEND target_libraries
-        ${tfpsacrypto_static_target})
+    list(APPEND target_libraries ${tfpsacrypto_static_target})
 endif()
 
 if(USE_STATIC_TF_PSA_CRYPTO_LIBRARY)
     set(target_objects "")
-    foreach(driver ${TF_PSA_CRYPTO_DRIVERS})
-        list(APPEND target_objects "$<TARGET_OBJECTS:${${driver}_static_target}>")
+    foreach(driver_target ${TF_PSA_CRYPTO_DRIVER_STATIC_TARGETS})
+        list(APPEND target_objects "$<TARGET_OBJECTS:${driver_target}>")
     endforeach()
     add_library(${tfpsacrypto_static_target} STATIC
         ${src_crypto}
@@ -153,8 +140,8 @@ endif(USE_STATIC_TF_PSA_CRYPTO_LIBRARY)
 if(USE_SHARED_TF_PSA_CRYPTO_LIBRARY)
     set(CMAKE_LIBRARY_PATH ${CMAKE_CURRENT_BINARY_DIR})
     set(target_objects "")
-    foreach(driver ${TF_PSA_CRYPTO_DRIVERS})
-        list(APPEND target_objects "$<TARGET_OBJECTS:${${driver}_target}>")
+    foreach(driver_target ${TF_PSA_CRYPTO_DRIVER_TARGETS})
+        list(APPEND target_objects "$<TARGET_OBJECTS:${driver_target}>")
     endforeach()
     add_library(${tfpsacrypto_target} SHARED
         ${src_crypto}
