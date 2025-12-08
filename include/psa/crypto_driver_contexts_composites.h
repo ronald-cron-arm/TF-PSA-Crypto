@@ -34,7 +34,7 @@
 
 #if defined(MBEDTLS_TEST_LIBTESTDRIVER1)
 #if defined(TF_PSA_CRYPTO_TEST_LIBTESTDRIVER1)
-#include "libtestdriver1/private/crypto_builtin_composites.h"
+#include "mbedtls/private/libtestdriver1-crypto_builtin_composites.h"
 #else
 #include <libtestdriver1/tf-psa-crypto/include/psa/crypto.h>
 #endif

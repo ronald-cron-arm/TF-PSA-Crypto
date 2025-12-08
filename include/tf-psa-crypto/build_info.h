@@ -160,7 +160,7 @@
 #include "mbedtls/private/crypto_adjust_config_enable_builtins.h"
 
 #if defined(TF_PSA_CRYPTO_TEST_LIBTESTDRIVER1)
-#include "libtestdriver1/private/crypto_adjust_config_enable_builtins.h"
+#include "mbedtls/private/libtestdriver1-crypto_adjust_config_enable_builtins.h"
 #endif
 
 /* Special header to adjust the configuration to make a build
@@ -179,7 +179,7 @@
 #include "mbedtls/private/crypto_adjust_config_tweak_builtins.h"
 
 #if defined(TF_PSA_CRYPTO_TEST_LIBTESTDRIVER1)
-#include "libtestdriver1/private/crypto_adjust_config_tweak_builtins.h"
+#include "mbedtls/private/libtestdriver1-crypto_adjust_config_tweak_builtins.h"
 #endif
 
 /* Indicate that all configuration symbols are set,
