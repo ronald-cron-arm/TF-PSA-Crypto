@@ -112,8 +112,8 @@ def main():
         generator.write_list_vars_for_cmake(fname)
         return
 
-    #Build the test driver tree from `drivers/builtin`
-    generator.build_tree(IDENTIFIER_PREFIXES)
+    #Create the test driver tree from `drivers/builtin`
+    generator.create_test_driver_tree(IDENTIFIER_PREFIXES)
 
 if __name__ == "__main__":
     sys.exit(main())
