@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproduce the RSA-SM3 signatures in test_suite_psa_crypto.data."""
+"""Reproduce the deterministic ECDSA-SM3 and RSA-SM3 signatures."""
 
 # Copyright The Mbed TLS Contributors
 # SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
@@ -8,13 +8,15 @@ import hashlib
 import re
 from pathlib import Path
 
-from Crypto.PublicKey import RSA
-from Crypto.Signature import pkcs1_15, pss
+from Crypto.PublicKey import ECC, RSA
+from Crypto.Signature import DSS, pkcs1_15, pss
 
 
 DATA_FILE = (Path(__file__).parents[1] / "suites" /
              "test_suite_psa_crypto.data")
 MESSAGE_TEST = "PSA sign/verify message: RSA PKCS#1 v1.5 SM3"
+ECDSA_HASH_TEST = "PSA sign hash: deterministic ECDSA SECP256R1 SM3"
+ECDSA_MESSAGE_TEST = "PSA sign message: deterministic ECDSA SECP256R1 SM3"
 PKCS1_TEST = ("PSA verify message: RSA PKCS#1 v1.5 SM3, "
               "PyCryptodome signature")
 PSS_TEST = "PSA verify message: RSA PSS SM3, PyCryptodome signature"
@@ -25,6 +27,7 @@ class SM3:
 
     oid = "1.2.156.10197.1.401"
     digest_size = 32
+    block_size = 64
 
     def __init__(self, data=b""):
         self._hash = hashlib.new("sm3", data)
@@ -36,6 +39,12 @@ class SM3:
     def digest(self):
         """Return the hash value."""
         return self._hash.digest()
+
+    def copy(self):
+        """Return a copy of the hash object."""
+        result = type(self)()
+        result._hash = self._hash.copy()
+        return result
 
     def new(self, data=b""):
         """Return a new SM3 hash object."""
@@ -53,6 +62,19 @@ def quoted_hex_fields(test_name):
 
 def main():
     """Generate the signatures and check them against the test vectors."""
+    ecdsa_private_key, message, expected_ecdsa_signature = \
+        quoted_hex_fields(ECDSA_MESSAGE_TEST)
+    ecdsa_key = ECC.construct(curve="P-256",
+                              d=int.from_bytes(ecdsa_private_key, "big"))
+    ecdsa_signature = DSS.new(ecdsa_key, "deterministic-rfc6979",
+                              encoding="binary").sign(SM3(message))
+
+    _, digest, expected_ecdsa_hash_signature = \
+        quoted_hex_fields(ECDSA_HASH_TEST)
+    assert SM3(message).digest() == digest
+    assert ecdsa_signature == expected_ecdsa_signature
+    assert ecdsa_signature == expected_ecdsa_hash_signature
+
     private_key_der, message = quoted_hex_fields(MESSAGE_TEST)
     key = RSA.import_key(private_key_der)
 
@@ -73,6 +95,7 @@ def main():
     assert pss_signature == expected_pss_signature
 
     print("SM3(message):", SM3(message).digest().hex())
+    print("Deterministic ECDSA-SM3 signature:", ecdsa_signature.hex())
     print("RSA PKCS#1 v1.5-SM3 signature:", pkcs1_signature.hex())
     print("RSA-PSS-SM3 salt:", salt.hex())
     print("RSA-PSS-SM3 signature:", pss_signature.hex())
