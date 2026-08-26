@@ -290,6 +290,10 @@ Key derivation: HKDF using SHA-384
 depends_on:PSA_WANT_ALG_HKDF:PSA_WANT_ALG_SHA_384
 key_derivation_algorithm:PSA_ALG_HKDF( PSA_ALG_SHA_384 ):ALG_IS_HKDF
 
+Key derivation: HKDF using SM3
+depends_on:PSA_WANT_ALG_HKDF:PSA_WANT_ALG_SM3
+key_derivation_algorithm:PSA_ALG_HKDF( PSA_ALG_SM3 ):ALG_IS_HKDF
+
 Key derivation: HKDF-Extract using SHA-256
 depends_on:PSA_WANT_ALG_HKDF_EXTRACT:PSA_WANT_ALG_SHA_256
 key_derivation_algorithm:PSA_ALG_HKDF_EXTRACT( PSA_ALG_SHA_256 ):ALG_IS_HKDF_EXTRACT
@@ -298,6 +302,10 @@ Key derivation: HKDF-Extract using SHA-384
 depends_on:PSA_WANT_ALG_HKDF_EXTRACT:PSA_WANT_ALG_SHA_384
 key_derivation_algorithm:PSA_ALG_HKDF_EXTRACT( PSA_ALG_SHA_384 ):ALG_IS_HKDF_EXTRACT
 
+Key derivation: HKDF-Extract using SM3
+depends_on:PSA_WANT_ALG_HKDF_EXTRACT:PSA_WANT_ALG_SM3
+key_derivation_algorithm:PSA_ALG_HKDF_EXTRACT( PSA_ALG_SM3 ):ALG_IS_HKDF_EXTRACT
+
 Key derivation: HKDF-Expand using SHA-256
 depends_on:PSA_WANT_ALG_HKDF_EXPAND:PSA_WANT_ALG_SHA_256
 key_derivation_algorithm:PSA_ALG_HKDF_EXPAND( PSA_ALG_SHA_256 ):ALG_IS_HKDF_EXPAND
@@ -305,6 +313,10 @@ key_derivation_algorithm:PSA_ALG_HKDF_EXPAND( PSA_ALG_SHA_256 ):ALG_IS_HKDF_EXPA
 Key derivation: HKDF-Expand using SHA-384
 depends_on:PSA_WANT_ALG_HKDF_EXPAND:PSA_WANT_ALG_SHA_384
 key_derivation_algorithm:PSA_ALG_HKDF_EXPAND( PSA_ALG_SHA_384 ):ALG_IS_HKDF_EXPAND
+
+Key derivation: HKDF-Expand using SM3
+depends_on:PSA_WANT_ALG_HKDF_EXPAND:PSA_WANT_ALG_SM3
+key_derivation_algorithm:PSA_ALG_HKDF_EXPAND( PSA_ALG_SM3 ):ALG_IS_HKDF_EXPAND
 
 Key derivation: TLS1.2 ECJPAKE-to-PMS
 depends_on:PSA_WANT_ALG_TLS12_ECJPAKE_TO_PMS
