@@ -437,6 +437,9 @@ ecc_key_family:PSA_ECC_FAMILY_BRAINPOOL_P_R1
 ECC key family: Montgomery (Curve25519, Curve448)
 ecc_key_family:PSA_ECC_FAMILY_MONTGOMERY
 
+ECC key family: SM2
+ecc_key_family:PSA_ECC_FAMILY_SM2
+
 ECC key family: Twisted Edwards (Ed25519, Ed448)
 ecc_key_family:PSA_ECC_FAMILY_TWISTED_EDWARDS
 

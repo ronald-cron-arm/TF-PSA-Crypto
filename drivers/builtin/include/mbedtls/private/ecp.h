@@ -57,6 +57,7 @@
     defined(MBEDTLS_ECP_DP_BP256R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_BP384R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_BP512R1_ENABLED) || \
+    defined(MBEDTLS_ECP_DP_SM2P256V1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_SECP256K1_ENABLED)
 #define MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED
 #endif
@@ -106,6 +107,7 @@ typedef enum {
     MBEDTLS_ECP_DP_CURVE25519,     /*!< Domain parameters for Curve25519. */
     MBEDTLS_ECP_DP_SECP256K1,      /*!< Domain parameters for 256-bit "Koblitz" curve. */
     MBEDTLS_ECP_DP_CURVE448,       /*!< Domain parameters for Curve448. */
+    MBEDTLS_ECP_DP_SM2P256V1,      /*!< Domain parameters for the SM2 curve. */
 } mbedtls_ecp_group_id;
 
 #if defined(MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS)

@@ -184,6 +184,11 @@ psa_ecc_family_t mbedtls_ecc_group_to_psa(mbedtls_ecp_group_id grpid,
             *bits = 256;
             return PSA_ECC_FAMILY_BRAINPOOL_P_R1;
 #endif
+#if defined(PSA_WANT_ECC_SM2_256)
+        case MBEDTLS_ECP_DP_SM2P256V1:
+            *bits = 256;
+            return PSA_ECC_FAMILY_SM2;
+#endif
 #if defined(PSA_WANT_ECC_BRAINPOOL_P_R1_384)
         case MBEDTLS_ECP_DP_BP384R1:
             *bits = 384;
@@ -251,6 +256,14 @@ mbedtls_ecp_group_id mbedtls_ecc_group_from_psa(psa_ecc_family_t family,
                     return MBEDTLS_ECP_DP_BP512R1;
 #endif
             }
+            break;
+
+        case PSA_ECC_FAMILY_SM2:
+#if defined(PSA_WANT_ECC_SM2_256)
+            if (bits == 256) {
+                return MBEDTLS_ECP_DP_SM2P256V1;
+            }
+#endif
             break;
 
         case PSA_ECC_FAMILY_MONTGOMERY:

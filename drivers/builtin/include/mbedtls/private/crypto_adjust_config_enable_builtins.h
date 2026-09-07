@@ -54,6 +54,8 @@
     !defined(MBEDTLS_PSA_ACCEL_ECC_BRAINPOOL_P_R1_384)) || \
     (defined(PSA_WANT_ECC_BRAINPOOL_P_R1_512) && \
     !defined(MBEDTLS_PSA_ACCEL_ECC_BRAINPOOL_P_R1_512)) || \
+    (defined(PSA_WANT_ECC_SM2_256) && \
+    !defined(MBEDTLS_PSA_ACCEL_ECC_SM2_256)) || \
     (defined(PSA_WANT_ECC_SECP_R1_256) && !defined(MBEDTLS_PSA_ACCEL_ECC_SECP_R1_256)) || \
     (defined(PSA_WANT_ECC_SECP_R1_384) && !defined(MBEDTLS_PSA_ACCEL_ECC_SECP_R1_384)) || \
     (defined(PSA_WANT_ECC_SECP_R1_521) && !defined(MBEDTLS_PSA_ACCEL_ECC_SECP_R1_521)) || \
@@ -134,6 +136,15 @@
 #define MBEDTLS_ECP_DP_BP512R1_ENABLED
 #endif /* missing accel */
 #endif /* PSA_WANT_ECC_BRAINPOOL_P_R1_512 */
+
+#if defined(PSA_WANT_ECC_SM2_256)
+#if !defined(MBEDTLS_PSA_ACCEL_ECC_SM2_256) || \
+    defined(MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_KEY_TYPES) || \
+    defined(MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_ALGS)
+#define MBEDTLS_PSA_BUILTIN_ECC_SM2_256 1
+#define MBEDTLS_ECP_DP_SM2P256V1_ENABLED
+#endif /* missing accel */
+#endif /* PSA_WANT_ECC_SM2_256 */
 
 #if defined(PSA_WANT_ECC_MONTGOMERY_255)
 #if !defined(MBEDTLS_PSA_ACCEL_ECC_MONTGOMERY_255) || \

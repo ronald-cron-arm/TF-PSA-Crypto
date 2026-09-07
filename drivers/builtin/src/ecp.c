@@ -333,6 +333,9 @@ static const mbedtls_ecp_curve_info ecp_supported_curves[] =
 #if defined(MBEDTLS_ECP_DP_BP256R1_ENABLED)
     { MBEDTLS_ECP_DP_BP256R1,      26,     256,    "brainpoolP256r1"   },
 #endif
+#if defined(MBEDTLS_ECP_DP_SM2P256V1_ENABLED)
+    { MBEDTLS_ECP_DP_SM2P256V1,    41,     256,    "SM2"               },
+#endif
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
     { MBEDTLS_ECP_DP_CURVE25519,   29,     256,    "x25519"            },
 #endif

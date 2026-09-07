@@ -212,6 +212,9 @@
 /* brainpoolP512r1 OBJECT IDENTIFIER ::= {versionOne 13} */
 #define MBEDTLS_OID_EC_GRP_BP512R1          MBEDTLS_OID_EC_BRAINPOOL_V1 "\x0D"
 
+/* curveSM2 OBJECT IDENTIFIER ::= { 1 2 156 10197 1 301 } */
+#define MBEDTLS_OID_EC_GRP_SM2               "\x2a\x81\x1c\xcf\x55\x01\x82\x2d"
+
 /*
  * SEC1 C.1
  *

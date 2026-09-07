@@ -67,6 +67,12 @@ static int check_ecc_parameters(psa_ecc_family_t family, size_t *bits)
             }
             break;
 
+        case PSA_ECC_FAMILY_SM2:
+            if (*bits == 256) {
+                return PSA_SUCCESS;
+            }
+            break;
+
         case PSA_ECC_FAMILY_MONTGOMERY:
             switch (*bits) {
                 case 448:

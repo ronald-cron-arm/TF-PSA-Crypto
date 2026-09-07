@@ -25,6 +25,10 @@ ECP curve info #6
 depends_on:MBEDTLS_ECP_DP_SECP256R1_ENABLED
 mbedtls_ecp_curve_info:MBEDTLS_ECP_DP_SECP256R1:23:256:"secp256r1"
 
+ECP curve info SM2
+depends_on:MBEDTLS_ECP_DP_SM2P256V1_ENABLED
+mbedtls_ecp_curve_info:MBEDTLS_ECP_DP_SM2P256V1:41:256:"SM2"
+
 # Test case #7 was removed because it was using curve secp224r1 which has been removed
 
 # Test case #8 was removed because it was using curve secp192r1 which has been removed
@@ -375,6 +379,10 @@ mbedtls_ecp_group_metadata:MBEDTLS_ECP_DP_CURVE25519:256:MBEDTLS_ECP_TYPE_MONTGO
 Check ECP group metadata #13 curve448 (RFC 7748)
 depends_on:MBEDTLS_ECP_DP_CURVE448_ENABLED
 mbedtls_ecp_group_metadata:MBEDTLS_ECP_DP_CURVE448:448:MBEDTLS_ECP_TYPE_MONTGOMERY:"fffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffff":"262a6":"":"5":"":"3fffffffffffffffffffffffffffffffffffffffffffffffffffffff7cca23e9c44edb49aed63690216cc2728dc58f552378c292ab5844f3":30
+
+Check ECP group metadata curveSM2 (GB/T 32918.5)
+depends_on:MBEDTLS_ECP_DP_SM2P256V1_ENABLED
+mbedtls_ecp_group_metadata:MBEDTLS_ECP_DP_SM2P256V1:256:MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS:"fffffffeffffffffffffffffffffffffffffffff00000000ffffffffffffffff":"fffffffeffffffffffffffffffffffffffffffff00000000fffffffffffffffc":"28e9fa9e9d9f5e344d5a9e4bcf6509a7f39789f515ab8f92ddbcbd414d940e93":"32c4ae2c1f1981195f9904466a39c9948fe30bbff2660be1715a4589334c74c7":"bc3736a2f4f6779c59bdcee36b692153d0a9877cc62a474002df32e52139f0a0":"fffffffeffffffffffffffffffffffff7203df6b21c6052b53bbf40939d54123":41
 
 ECP tls read group #1 (record too short)
 mbedtls_ecp_tls_read_group:"0313":MBEDTLS_ERR_ECP_BAD_INPUT_DATA:0:0

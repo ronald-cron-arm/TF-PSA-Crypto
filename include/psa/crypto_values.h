@@ -655,6 +655,13 @@
  */
 #define PSA_ECC_FAMILY_BRAINPOOL_P_R1    ((psa_ecc_family_t) 0x30)
 
+/** The SM2 curve over a 256-bit prime field.
+ *
+ * This is the curveSM2 parameter set defined by GB/T 32918.5-2017.
+ * This identifier is a TF-PSA-Crypto vendor extension.
+ */
+#define PSA_ECC_FAMILY_SM2                ((psa_ecc_family_t) 0x33)
+
 /** Curve25519 and Curve448.
  *
  * This family comprises the following Montgomery curves:

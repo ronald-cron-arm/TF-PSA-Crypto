@@ -199,6 +199,12 @@ static const oid_ecp_grp_t oid_ecp_grp[] =
         MBEDTLS_ECP_DP_BP512R1,
     },
 #endif /* PSA_WANT_ECC_BRAINPOOL_P_R1_512 */
+#if defined(PSA_WANT_ECC_SM2_256)
+    {
+        OID_DESCRIPTOR(MBEDTLS_OID_EC_GRP_SM2, "SM2", "curveSM2"),
+        MBEDTLS_ECP_DP_SM2P256V1,
+    },
+#endif /* PSA_WANT_ECC_SM2_256 */
     {
         NULL_OID_DESCRIPTOR,
         MBEDTLS_ECP_DP_NONE,
