@@ -74,6 +74,7 @@
     (defined(PSA_WANT_ALG_ECDSA) && !defined(MBEDTLS_PSA_ACCEL_ALG_ECDSA)) || \
     (defined(PSA_WANT_ALG_DETERMINISTIC_ECDSA) && \
     !defined(MBEDTLS_PSA_ACCEL_ALG_DETERMINISTIC_ECDSA)) || \
+    (defined(PSA_WANT_ALG_SM2DSA) && !defined(MBEDTLS_PSA_ACCEL_ALG_SM2DSA)) || \
     (defined(PSA_WANT_ALG_JPAKE) && !defined(MBEDTLS_PSA_ACCEL_ALG_JPAKE))
 #define MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_ALGS
 #endif
@@ -250,6 +251,17 @@
 #define MBEDTLS_ASN1_WRITE_C
 #endif /* missing accel */
 #endif /* PSA_WANT_ALG_ECDSA */
+
+#if defined(PSA_WANT_ALG_SM2DSA)
+#if !defined(MBEDTLS_PSA_ACCEL_ALG_SM2DSA) || \
+    defined(MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_WEIERSTRASS_CURVES) || \
+    defined(MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_KEY_TYPES_BASIC)
+#define MBEDTLS_PSA_BUILTIN_ALG_SM2DSA 1
+#define MBEDTLS_PSA_BUILTIN_ALG_SM3 1
+#define MBEDTLS_ECP_C
+#define MBEDTLS_BIGNUM_C
+#endif /* missing accel */
+#endif /* PSA_WANT_ALG_SM2DSA */
 
 #if defined(PSA_WANT_ALG_JPAKE)
 #if !defined(MBEDTLS_PSA_ACCEL_ALG_JPAKE) || \

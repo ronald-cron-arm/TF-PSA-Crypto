@@ -7419,6 +7419,27 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
+void sm2_compute_z(int hash_alg, data_t *public_key, data_t *identity,
+                   data_t *expected)
+{
+    unsigned char output[PSA_HASH_MAX_SIZE];
+    size_t output_length = 0;
+
+    PSA_ASSERT(tf_psa_crypto_sm2_compute_z(hash_alg,
+                                           public_key->x, public_key->len,
+                                           identity->x, identity->len,
+                                           output, sizeof(output),
+                                           &output_length));
+    TEST_EQUAL(output_length, expected->len);
+    TEST_MEMORY_COMPARE(expected->x, expected->len,
+                        output, output_length);
+
+exit:
+    ;
+}
+/* END_CASE */
+
+/* BEGIN_CASE */
 void sign_verify_hash(int key_type_arg, data_t *key_data,
                       int alg_arg, data_t *input_data)
 {

@@ -465,7 +465,6 @@ psa_status_t mbedtls_psa_ecdsa_verify_hash(
     psa_algorithm_t alg, const uint8_t *hash, size_t hash_length,
     const uint8_t *signature, size_t signature_length);
 
-
 /** Perform a key agreement and return the raw ECDH shared secret.
  *
  * \note The signature of this function is that of a PSA driver

@@ -1619,6 +1619,26 @@
 #define PSA_ALG_IS_RANDOMIZED_ECDSA(alg)                                \
     (PSA_ALG_IS_ECDSA(alg) && !PSA_ALG_ECDSA_IS_DETERMINISTIC(alg))
 
+/** The base of the SM2 digital signature algorithm. */
+#define PSA_ALG_SM2DSA_BASE                     \
+    ((psa_algorithm_t) (PSA_ALG_VENDOR_FLAG | 0x06000800))
+
+/** SM2 digital signature over the curveSM2 parameter set.
+ *
+ * The identity-dependent ZA value is deliberately not implicit in this
+ * identifier. Use tf_psa_crypto_sm2_compute_z() with \p hash_alg to construct
+ * ZA before hashing and calling psa_sign_hash() or psa_verify_hash().
+ *
+ * \param hash_alg A hash algorithm (\c PSA_ALG_XXX value such that
+ *                 #PSA_ALG_IS_HASH(\p hash_alg) is true).
+ */
+#define PSA_ALG_SM2DSA(hash_alg)                                     \
+    (PSA_ALG_SM2DSA_BASE | ((hash_alg) & PSA_ALG_HASH_MASK))
+
+/** Whether an algorithm is the TF-PSA-Crypto SM2 signature extension. */
+#define PSA_ALG_IS_SM2DSA(alg)                                       \
+    (((alg) & ~PSA_ALG_HASH_MASK) == PSA_ALG_SM2DSA_BASE)
+
 /** Edwards-curve digital signature algorithm without prehashing (PureEdDSA),
  * using standard parameters.
  *
@@ -1727,7 +1747,7 @@
 #define PSA_ALG_IS_SIGN_HASH(alg)                                       \
     (PSA_ALG_IS_RSA_PSS(alg) || PSA_ALG_IS_RSA_PKCS1V15_SIGN(alg) ||    \
      PSA_ALG_IS_ECDSA(alg) || PSA_ALG_IS_HASH_EDDSA(alg) ||             \
-     PSA_ALG_IS_VENDOR_HASH_AND_SIGN(alg))
+     PSA_ALG_IS_SM2DSA(alg) || PSA_ALG_IS_VENDOR_HASH_AND_SIGN(alg))
 
 /** Whether the specified algorithm is a signature algorithm that can be used
  * with psa_sign_message() and psa_verify_message().
@@ -1741,7 +1761,8 @@
  *         supported algorithm identifier.
  */
 #define PSA_ALG_IS_SIGN_MESSAGE(alg)                                    \
-    (PSA_ALG_IS_SIGN_HASH(alg) || (alg) == PSA_ALG_PURE_EDDSA)
+    ((PSA_ALG_IS_SIGN_HASH(alg) && !PSA_ALG_IS_SM2DSA(alg)) ||          \
+     (alg) == PSA_ALG_PURE_EDDSA)
 
 /** Whether the specified algorithm is a hash-and-sign algorithm.
  *
@@ -1770,7 +1791,7 @@
  *         algorithm identifier.
  */
 #define PSA_ALG_IS_HASH_AND_SIGN(alg)                                   \
-    (PSA_ALG_IS_SIGN_HASH(alg) &&                                       \
+    (PSA_ALG_IS_SIGN_HASH(alg) && !PSA_ALG_IS_SM2DSA(alg) &&            \
      ((alg) & PSA_ALG_HASH_MASK) != 0)
 
 /** Get the hash used by a hash-and-sign signature algorithm.
@@ -1792,7 +1813,7 @@
  *              if it is not supported by the implementation.
  */
 #define PSA_ALG_SIGN_GET_HASH(alg)                                     \
-    (PSA_ALG_IS_HASH_AND_SIGN(alg) ?                                   \
+    (PSA_ALG_IS_HASH_AND_SIGN(alg) || PSA_ALG_IS_SM2DSA(alg) ?          \
      ((alg) & PSA_ALG_HASH_MASK) | PSA_ALG_CATEGORY_HASH :             \
      0)
 

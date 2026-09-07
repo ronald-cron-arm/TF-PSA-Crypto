@@ -1,0 +1,17 @@
+/* BEGIN_HEADER */
+
+#include "sm2_internal.h"
+
+/* END_HEADER */
+
+/* BEGIN_DEPENDENCIES
+ * depends_on:MBEDTLS_PSA_BUILTIN_ALG_SM2DSA
+ * END_DEPENDENCIES
+ */
+
+/* BEGIN_CASE depends_on:MBEDTLS_SELF_TEST */
+void sm2_selftest()
+{
+    TEST_EQUAL(tf_psa_crypto_sm2_self_test(1), 0);
+}
+/* END_CASE */

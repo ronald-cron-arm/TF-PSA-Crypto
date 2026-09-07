@@ -25,6 +25,22 @@
 extern "C" {
 #endif
 
+/** Compute the identity-bound SM2 ZA digest.
+ *
+ * This is a TF-PSA-Crypto vendor extension. The public key uses the PSA
+ * uncompressed Weierstrass representation (0x04 || X || Y). The hash
+ * algorithm must match the one in #PSA_ALG_SM2DSA().
+ */
+psa_status_t tf_psa_crypto_sm2_compute_z(
+    psa_algorithm_t hash_alg,
+    const uint8_t *public_key,
+    size_t public_key_length,
+    const uint8_t *identity,
+    size_t identity_length,
+    uint8_t *output,
+    size_t output_size,
+    size_t *output_length);
+
 /* UID for secure storage seed */
 #define PSA_CRYPTO_ITS_RANDOM_SEED_UID 0xFFFFFF52
 

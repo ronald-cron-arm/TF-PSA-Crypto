@@ -35,6 +35,7 @@
     defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_PUBLIC_KEY) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_ECDSA) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_DETERMINISTIC_ECDSA) || \
+    defined(MBEDTLS_PSA_BUILTIN_ALG_SM2DSA) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_ECDH)
 /* Helper function to verify if the provided EC's family and key bit size are valid.
  *

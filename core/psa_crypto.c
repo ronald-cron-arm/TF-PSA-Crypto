@@ -27,6 +27,9 @@
 #include "psa_crypto_rsa.h"
 #include "psa_crypto_ecp.h"
 #include "psa_crypto_slot_management.h"
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_SM2DSA)
+#include "sm2_internal.h"
+#endif
 /* Include internal declarations that are useful for implementing persistently
  * stored keys. */
 #include "psa_crypto_storage.h"
@@ -3357,7 +3360,14 @@ psa_status_t psa_sign_hash_builtin(
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     } else if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
-        if (PSA_ALG_IS_ECDSA(alg)) {
+        if (PSA_ALG_IS_SM2DSA(alg)) {
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_SM2DSA)
+            return tf_psa_crypto_sm2_sign_hash(
+                attributes, key_buffer, key_buffer_size,
+                alg, hash, hash_length,
+                signature, signature_size, signature_length);
+#endif
+        } else if (PSA_ALG_IS_ECDSA(alg)) {
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_ECDSA) || \
             defined(MBEDTLS_PSA_BUILTIN_ALG_DETERMINISTIC_ECDSA)
             return mbedtls_psa_ecdsa_sign_hash(
@@ -3431,7 +3441,13 @@ psa_status_t psa_verify_hash_builtin(
             return PSA_ERROR_INVALID_ARGUMENT;
         }
     } else if (PSA_KEY_TYPE_IS_ECC(attributes->type)) {
-        if (PSA_ALG_IS_ECDSA(alg)) {
+        if (PSA_ALG_IS_SM2DSA(alg)) {
+#if defined(MBEDTLS_PSA_BUILTIN_ALG_SM2DSA)
+            return tf_psa_crypto_sm2_verify_hash(
+                attributes, key_buffer, key_buffer_size,
+                alg, hash, hash_length, signature, signature_length);
+#endif
+        } else if (PSA_ALG_IS_ECDSA(alg)) {
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_ECDSA) || \
             defined(MBEDTLS_PSA_BUILTIN_ALG_DETERMINISTIC_ECDSA)
             return mbedtls_psa_ecdsa_verify_hash(
